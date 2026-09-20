@@ -22,22 +22,24 @@ FILES = {
     "terra": "sol-advisor-terra-implementer.toml",
     "sol": "sol-advisor-sol-reviewer.toml",
 }
-# Same immutable v0.2.0 and v0.5.0 fingerprints as install-agents.sh.
+# Same immutable v0.2.0, v0.5.0, and v0.6.0 fingerprints as install-agents.sh.
 LEGACY = {
     "luna": {
         "fba1b42849d93737e83b094a2ab0b1611f87ac37db7438c8bbdf581f0813f8eb",
         "5cfaf77f14757074ca5d3cfecd0b8204c91dc14eff8d6119985c64416ddf4853",
+        "12fa9180a292876e6731bc325779123bcd931c3caa902fbf90d676a31833be84",
     },
     "terra": {
         "4425a8c1f21ce8c6af93f96adc253bbc33ea301f1389b3fa8ce350be08584eca",
         "dc329fe87f6f6610c13157ec16432f91c79cf5a541ee3e7448f6afb165dd18ce",
+        "77ed2f36bb149da5d9032230c3d6f5e5cd56b059b3fa5f59085249bba06e1f3a",
     },
-    "sol": set(),
+    "sol": {"0333acf0ef562bcfebd06009ac09bd1dd8cbc04c4cf28e08e9e049bd8bf202d2"},
 }
 PINS = {
     "luna": ("sol_advisor_luna_implementer", "gpt-5.6-luna", "max"),
-    "terra": ("sol_advisor_terra_implementer", "gpt-5.6-terra", "high"),
-    "sol": ("sol_advisor_sol_reviewer", "gpt-5.6-sol", "high"),
+    "terra": ("sol_advisor_terra_implementer", "gpt-5.6-terra", "max"),
+    "sol": ("sol_advisor_sol_reviewer", "gpt-5.6-sol", "xhigh"),
 }
 UUID = re.compile(r"[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}\Z")
 

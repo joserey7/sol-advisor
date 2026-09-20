@@ -40,7 +40,7 @@ It stops on CLI errors, invalid JSON, missing or duplicate matches, or conflicts
 If plugin registration succeeds but companions fail, it reports that partial state.
 
 Restart Codex Desktop and start a new task so the custom-agent types can be discovered.
-Select Sol / High in the primary session, then use:
+Select Sol / xhigh in the primary session, then use:
 
 ~~~text
 Use $sol-advisor:orchestration to build this feature and verify it. Declare the selective route before task tools.

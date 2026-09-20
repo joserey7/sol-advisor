@@ -70,7 +70,7 @@ try {
     # Use the installed bundle, not potentially different templates in this checkout.
     & $python.Executable @prefix $helper install
     if ($LASTEXITCODE -ne 0) { throw 'Plugin is registered, but companion installation failed. Resolve the reported conflict; do not overwrite customized files blindly.' }
-    Write-Output 'PLUGIN INSTALL PASSED. Restart Codex Desktop and start a NEW task; select Sol / High in the primary session.'
+    Write-Output 'PLUGIN INSTALL PASSED. Restart Codex Desktop and start a NEW task; select Sol / xhigh in the primary session.'
     exit 0
 } catch {
     [Console]::Error.WriteLine('ERROR: ' + $_.Exception.Message)
