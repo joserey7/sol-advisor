@@ -1,6 +1,6 @@
 # Sol Advisor
 
-**Sol / High runs the show. It declares a risk-gated route before task tools, keeps
+**Sol / xhigh runs the show. It declares a risk-gated route before task tools, keeps
 solo as the default, and uses a single auxiliary only when that improves delivery.**
 
 Sol Advisor is a Codex-only workflow for capability-routed software delivery. You
@@ -14,8 +14,8 @@ I write [**Attention Heads**](https://attentionheads.substack.com/?utm_source=gi
 ## Quick start
 
 You need a current Codex CLI or ChatGPT desktop app with plugins enabled, GPT-5.6
-Sol / High for the primary session, native custom-agent support, and jq. GPT-5.6
-Luna / Max or Terra / High access is needed only when the selected route delegates.
+Sol / xhigh for the primary session, native custom-agent support, and jq. GPT-5.6
+Luna / Max or Terra / Max access is needed only when the selected route delegates.
 
 ~~~sh
 codex plugin marketplace add DannyMac180/sol-advisor --ref main
@@ -45,9 +45,9 @@ acceptance.
 | Mode | Use it when | Delivery |
 |---|---|---|
 | `solo` | Default; risk is contained. | Root plans, implements, tests, and self-reviews. |
-| `delegate` | A complete spec is better executed by one implementer. | Luna / Max for bounded work, or Terra / High for judgment-heavy or high-risk work; root verifies. |
-| `audit` | Independent final scrutiny matters more than delegation. | Root implements; a fresh read-only Sol / High reviews. |
-| `full` | Explicit broad or high-risk exception. | One selected implementer, root verification, and a fresh Sol / High review. |
+| `delegate` | A complete spec is better executed by one implementer. | Luna / Max for bounded work, or Terra / Max for judgment-heavy or high-risk work; root verifies. |
+| `audit` | Independent final scrutiny matters more than delegation. | Root implements; a fresh read-only Sol / xhigh reviews. |
+| `full` | Explicit broad or high-risk exception. | One selected implementer, root verification, and a fresh Sol / xhigh review. |
 
 Solo is the default. One auxiliary is the default maximum; `full` is the explicit
 exception. Sol emits a `SELECTIVE ROUTE` declaration with the mode and concise risk
@@ -56,11 +56,11 @@ risk justifies it and never silently downgrades.
 
 ## What happens automatically
 
-Sol / High keeps architecture, decomposition, route selection, parent verification,
+Sol / xhigh keeps architecture, decomposition, route selection, parent verification,
 escalation decisions, and acceptance in the primary task. Auxiliary work substitutes
 for root work; it does not duplicate it. The root inspects the complete diff and
 reruns the requested checks. When the selected route includes a review, a fresh Sol /
-High reviewer returns ship, fix-first, or rethink; any fix requires a new review.
+xhigh reviewer returns ship, fix-first, or rethink; any fix requires a new review.
 
 ## Updating
 

@@ -17,10 +17,10 @@ preflight, runtime-evidence, isolation, and maintainer procedures.
 
 ## Confirm the primary session
 
-Run the primary Codex session on gpt-5.6-sol with high reasoning. Verify the current
+Run the primary Codex session on gpt-5.6-sol with xhigh reasoning. Verify the current
 model and effort when runtime metadata exposes them. If either differs, tell the user
-to select Sol / High and stop before delegation. If runtime metadata does not expose
-them, ask the user to confirm Sol / High and stop until confirmed. A skill cannot
+to select Sol / xhigh and stop before delegation. If runtime metadata does not expose
+them, ask the user to confirm Sol / xhigh and stop until confirmed. A skill cannot
 change the primary model itself; never assume or claim this prerequisite is satisfied.
 
 ## Declare the route before task tools
@@ -40,8 +40,8 @@ escalation. Details and the task-scoped preflight matrix are in operations.md.
 
 ## Preflight selected auxiliaries only
 
-Confirm Sol / High in the primary session. Preflight only an auxiliary selected by the
-declared route: none for solo; Luna / Max or Terra / High for delegate; fresh Sol / High
+Confirm Sol / xhigh in the primary session. Preflight only an auxiliary selected by the
+declared route: none for solo; Luna / Max or Terra / Max for delegate; fresh Sol / xhigh
 for audit; and the selected implementer plus fresh Sol reviewer for full. Public metadata
 for role, model, and effort is authoritative. If it omits a model or effort, use the
 local inspector only for that omitted field. Missing, conflicting, unavailable, or
@@ -51,16 +51,16 @@ model, effort, or reviewer.
 ## Route delivery without duplication
 
 - `solo`: root plans, implements, tests, and self-reviews; spawn no auxiliary.
-- `delegate`: select Luna / Max for bounded, fully specified work, or Terra / High for
+- `delegate`: select Luna / Max for bounded, fully specified work, or Terra / Max for
   judgment-heavy, high-risk, context-heavy, or wide-blast-radius work. The selected
   implementer executes the complete spec; root verifies; do not request a fresh review.
-- `audit`: root implements and verifies; a fresh read-only Sol / High reviewer reviews
+- `audit`: root implements and verifies; a fresh read-only Sol / xhigh reviewer reviews
   the accumulated diff; spawn no implementer.
 - `full`: only for an explicit broad or high-risk exception. Select one implementer,
-  root verifies, then a fresh read-only Sol / High reviewer reviews.
+  root verifies, then a fresh read-only Sol / xhigh reviewer reviews.
 
 Auxiliary work must substitute for root work, not duplicate it. A Luna result may
-justify escalation to Terra / High only when it reveals newly observed complexity,
+justify escalation to Terra / Max only when it reveals newly observed complexity,
 risk, wide blast radius, or misclassification. A corrected Luna attempt is reserved
 for a specification error and is not a prerequisite for Terra. Any route change must
 be declared and evidenced; do not silently downgrade.
@@ -87,7 +87,7 @@ selected implementer's work in the primary session.
 
 ## Review only when the route includes it
 
-For `audit` and `full`, after parent verification, spawn a new native Sol / High
+For `audit` and `full`, after parent verification, spawn a new native Sol / xhigh
 reviewer. The reviewer must remain behaviorally read-only, inspect the actual
 accumulated diff, and return exactly ship, fix-first, or rethink. A reviewer never
 implements its own fixes. `solo` and `delegate` do not receive a fresh reviewer.
