@@ -1,0 +1,43 @@
+name: Verify native compatibility
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  posix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install POSIX verifier dependencies
+        run: sudo apt-get update && sudo apt-get install -y jq ripgrep libdigest-sha-perl
+      - name: Existing POSIX regression suite
+        run: sh plugins/sol-advisor/scripts/verify.sh
+      - name: Portable companion tests
+        run: python -m unittest discover -s tests -v
+      - name: Whitespace checks
+        run: git diff --check
+  windows:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shell: [powershell, pwsh]
+        python: ['3.11', '3.13']
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
+    env:
+      PYTHONUTF8: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Portable companion tests
+        run: |
+          python -m unittest discover -s tests -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Native PowerShell entry points and mock CLI bootstrap
+        run: ./tests/verify-windows.ps1

@@ -15,6 +15,11 @@ Read [references/role-contracts.md](references/role-contracts.md) before the fir
 delegation. Use [references/operations.md](references/operations.md) for exact spawn,
 preflight, runtime-evidence, isolation, and maintainer procedures.
 
+On native Windows, use [references/windows.md](references/windows.md) for the
+PowerShell companion commands instead of the POSIX examples. Resolve helpers from
+the installed skill directory, not the working repository. Do not fall back to WSL
+or change Codex homes when a native preflight fails.
+
 ## Confirm the primary session
 
 Run the primary Codex session on gpt-5.6-sol with xhigh reasoning. Verify the current

@@ -4,6 +4,10 @@ This is the maintainer and operator reference for Sol Advisor's native custom-ag
 workflow. Keep the README user-facing; use this page when installing, delegating,
 inspecting routing, or validating a release.
 
+The shell examples below are for macOS/Linux. On native Windows use the equivalent
+PowerShell procedures in [Windows operations](windows.md), including role-scoped
+checks and runtime inspection. Routing and read-only acceptance rules are unchanged.
+
 ## Role pins and spawn contract
 
 The installed TOMLs are the source of truth:
