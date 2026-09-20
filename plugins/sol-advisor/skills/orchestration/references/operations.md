@@ -11,8 +11,8 @@ The installed TOMLs are the source of truth:
 | Role type | Model | Effort | Use |
 |---|---|---|---|
 | sol_advisor_luna_implementer | gpt-5.6-luna | max | Delegate/full bounded routine implementation |
-| sol_advisor_terra_implementer | gpt-5.6-terra | high | Delegate/full judgment-heavy or high-risk implementation |
-| sol_advisor_sol_reviewer | gpt-5.6-sol | high | Audit/full fresh review; requests read-only sandbox |
+| sol_advisor_terra_implementer | gpt-5.6-terra | max | Delegate/full judgment-heavy or high-risk implementation |
+| sol_advisor_sol_reviewer | gpt-5.6-sol | xhigh | Audit/full fresh review; requests read-only sandbox |
 
 Native spawn requests name the role and use a fresh context:
 
@@ -40,7 +40,7 @@ unobservable role/model/effort is a hard stop; never substitute another role.
 
 ## Selective route declaration, preflight, and caching
 
-The primary session must be Sol / High. Companion installation is separate from task
+The primary session must be Sol / xhigh. Companion installation is separate from task
 routing because plugin installation does not register user-owned TOMLs.
 
 At installation or update time, run the repository-relative installer and its exactness
@@ -61,9 +61,10 @@ sh "$installer" --check
 ~~~
 
 The installer is fail-closed and performs its own post-install exactness check. It
-recognizes only byte-exact historical templates, including the shipped v0.2.0 profiles
-and the v0.5.0 Luna/Terra profiles during a v0.5.1 update. Modified/unsafe/nonregular/
-symlinked/conflicting destinations remain refusals, and all mutations are preflighted.
+recognizes only byte-exact historical templates, including the shipped v0.2.0 and
+v0.5.0 profiles and the v0.6.0 Luna/Terra/Sol profiles from before the v0.7.0 effort
+retune. Modified/unsafe/nonregular/symlinked/conflicting destinations remain refusals,
+and all mutations are preflighted.
 
 The root emits one machine-auditable declaration before its first task tool call:
 
@@ -103,7 +104,7 @@ check ignores unselected role destinations, while the all-role --check behavior
 remains unchanged. Cache successful checks only for the task; never carry them across
 later tasks, installation/update, or routing/configuration changes.
 
-Luna / Max is for bounded, fully specified work. Terra / High is selected for
+Luna / Max is for bounded, fully specified work. Terra / Max is selected for
 judgment-heavy, high-risk, context-heavy, or wide-blast-radius work. A Luna result
 may justify a declared Terra escalation only when it shows newly observed risk. One
 corrected Luna attempt is reserved for a specification error and is not a prerequisite
@@ -136,8 +137,8 @@ conflicting model/effort/sandbox/permission/working-directory values. It never p
 prompts, messages, environment variables, tokens, configuration, or arbitrary rollout
 payloads.
 
-Accepted routing is Luna / max for bounded delegate/full implementation, Terra / high
-for higher-risk delegate/full implementation, and Sol / high for audit/full review.
+Accepted routing is Luna / max for bounded delegate/full implementation, Terra / max
+for higher-risk delegate/full implementation, and Sol / xhigh for audit/full review.
 If public and local evidence both exist, they must agree. The local inspector is not a
 model-selection fallback.
 
@@ -188,6 +189,6 @@ git status --short
 git diff --stat
 ~~~
 
-The verifier covers the v0.6.0 manifest, exact three-role TOMLs, selective-routing
+The verifier covers the v0.7.0 manifest, exact three-role TOMLs, selective-routing
 contracts, concise README journey, absence of retired workflow references, installer
 safety fixtures, Luna runtime evidence, JSON/TOML validity, and shell syntax.
