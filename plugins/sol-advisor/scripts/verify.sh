@@ -46,6 +46,9 @@ legacy_terra_v050_sha256=dc329fe87f6f6610c13157ec16432f91c79cf5a541ee3e7448f6afb
 legacy_luna_v060_sha256=12fa9180a292876e6731bc325779123bcd931c3caa902fbf90d676a31833be84
 legacy_terra_v060_sha256=77ed2f36bb149da5d9032230c3d6f5e5cd56b059b3fa5f59085249bba06e1f3a
 legacy_sol_sha256=0333acf0ef562bcfebd06009ac09bd1dd8cbc04c4cf28e08e9e049bd8bf202d2
+legacy_luna_v060_crlf_sha256=000ff8bed7f94f77a460fb81424d51233eb6146db5b21a346068aceb6a9abe27
+legacy_terra_v060_crlf_sha256=7c9497c46207007565f72ac9bac6ce4954a1491914e4d64b44e27e4c27e8cd43
+legacy_sol_crlf_sha256=6ac63677bcc8677a9a743522cf06696c8edb1b005a61430e0fc8fa62e18dc355
 
 snapshot_files() {
   target=$1
@@ -301,6 +304,9 @@ grep -Fq "legacy_terra_v050_sha256=$legacy_terra_v050_sha256" "$installer" || fa
 grep -Fq "legacy_luna_v060_sha256=$legacy_luna_v060_sha256" "$installer" || fail "installer v0.6.0 Luna digest mismatch"
 grep -Fq "legacy_terra_v060_sha256=$legacy_terra_v060_sha256" "$installer" || fail "installer v0.6.0 Terra digest mismatch"
 grep -Fq "legacy_sol_sha256=$legacy_sol_sha256" "$installer" || fail "installer legacy Sol digest mismatch"
+grep -Fq "legacy_luna_v060_crlf_sha256=$legacy_luna_v060_crlf_sha256" "$installer" || fail "installer v0.6.0 CRLF Luna digest mismatch"
+grep -Fq "legacy_terra_v060_crlf_sha256=$legacy_terra_v060_crlf_sha256" "$installer" || fail "installer v0.6.0 CRLF Terra digest mismatch"
+grep -Fq "legacy_sol_crlf_sha256=$legacy_sol_crlf_sha256" "$installer" || fail "installer legacy CRLF Sol digest mismatch"
 pass "immutable historical migration fingerprints"
 
 clean_target=$tmp_dir/clean
@@ -420,6 +426,35 @@ if sh "$installer" --target-dir "$modified_v060_sol"; then fail "installer repla
 after=$(snapshot_files "$modified_v060_sol")
 [ "$before" = "$after" ] || fail "modified v0.6.0 Sol refusal partially mutated target"
 pass "modified v0.6.0 Sol refusal with zero partial mutation"
+
+v060_crlf_target=$tmp_dir/v060-crlf-migration
+write_v060_roles "$v060_crlf_target"
+for role in "$luna_file" "$terra_file" "$sol_file"; do
+  awk '{ printf "%s\r\n", $0 }' "$v060_crlf_target/$role" > "$v060_crlf_target/$role.crlf"
+  mv "$v060_crlf_target/$role.crlf" "$v060_crlf_target/$role"
+done
+[ "$(shasum -a 256 "$v060_crlf_target/$luna_file" | awk '{print $1}')" = "$legacy_luna_v060_crlf_sha256" ] || fail "v0.6.0 CRLF Luna fixture digest drifted"
+[ "$(shasum -a 256 "$v060_crlf_target/$terra_file" | awk '{print $1}')" = "$legacy_terra_v060_crlf_sha256" ] || fail "v0.6.0 CRLF Terra fixture digest drifted"
+[ "$(shasum -a 256 "$v060_crlf_target/$sol_file" | awk '{print $1}')" = "$legacy_sol_crlf_sha256" ] || fail "v0.6.0 CRLF Sol fixture digest drifted"
+sh "$installer" --target-dir "$v060_crlf_target"
+for role in "$luna_file" "$terra_file" "$sol_file"; do
+  cmp -s "$templates/$role" "$v060_crlf_target/$role" || fail "v0.6.0 CRLF migration mismatch: $role"
+done
+sh "$installer" --target-dir "$v060_crlf_target" --check
+pass "exact v0.6.0 CRLF Windows profiles migrate to the new effort policy"
+
+crlf_current=$tmp_dir/crlf-current
+sh "$installer" --target-dir "$crlf_current"
+for role in "$luna_file" "$terra_file" "$sol_file"; do
+  awk '{ printf "%s\r\n", $0 }' "$crlf_current/$role" > "$crlf_current/$role.crlf"
+  mv "$crlf_current/$role.crlf" "$crlf_current/$role"
+done
+before=$(snapshot_files "$crlf_current")
+if sh "$installer" --target-dir "$crlf_current"; then fail "installer accepted current templates with CRLF line endings"; fi
+if sh "$installer" --target-dir "$crlf_current" --check; then fail "--check accepted current templates with CRLF line endings"; fi
+after=$(snapshot_files "$crlf_current")
+[ "$before" = "$after" ] || fail "CRLF current-template refusal mutated target"
+pass "current templates with CRLF line endings remain conflicts"
 
 modified_v050_luna=$tmp_dir/modified-v050-luna
 write_v050_roles "$modified_v050_luna"
