@@ -23,18 +23,25 @@ FILES = {
     "sol": "sol-advisor-sol-reviewer.toml",
 }
 # Same immutable v0.2.0, v0.5.0, and v0.6.0 fingerprints as install-agents.sh.
+# The v0.6.0 CRLF entries are the exact bytes earlier Windows checkouts installed;
+# current templates with changed line endings still classify as conflicts.
 LEGACY = {
     "luna": {
         "fba1b42849d93737e83b094a2ab0b1611f87ac37db7438c8bbdf581f0813f8eb",
         "5cfaf77f14757074ca5d3cfecd0b8204c91dc14eff8d6119985c64416ddf4853",
         "12fa9180a292876e6731bc325779123bcd931c3caa902fbf90d676a31833be84",
+        "000ff8bed7f94f77a460fb81424d51233eb6146db5b21a346068aceb6a9abe27",
     },
     "terra": {
         "4425a8c1f21ce8c6af93f96adc253bbc33ea301f1389b3fa8ce350be08584eca",
         "dc329fe87f6f6610c13157ec16432f91c79cf5a541ee3e7448f6afb165dd18ce",
         "77ed2f36bb149da5d9032230c3d6f5e5cd56b059b3fa5f59085249bba06e1f3a",
+        "7c9497c46207007565f72ac9bac6ce4954a1491914e4d64b44e27e4c27e8cd43",
     },
-    "sol": {"0333acf0ef562bcfebd06009ac09bd1dd8cbc04c4cf28e08e9e049bd8bf202d2"},
+    "sol": {
+        "0333acf0ef562bcfebd06009ac09bd1dd8cbc04c4cf28e08e9e049bd8bf202d2",
+        "6ac63677bcc8677a9a743522cf06696c8edb1b005a61430e0fc8fa62e18dc355",
+    },
 }
 PINS = {
     "luna": ("sol_advisor_luna_implementer", "gpt-5.6-luna", "max"),

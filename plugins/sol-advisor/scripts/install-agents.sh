@@ -224,6 +224,12 @@ legacy_terra_v050_sha256=dc329fe87f6f6610c13157ec16432f91c79cf5a541ee3e7448f6afb
 legacy_luna_v060_sha256=12fa9180a292876e6731bc325779123bcd931c3caa902fbf90d676a31833be84
 legacy_terra_v060_sha256=77ed2f36bb149da5d9032230c3d6f5e5cd56b059b3fa5f59085249bba06e1f3a
 legacy_sol_sha256=0333acf0ef562bcfebd06009ac09bd1dd8cbc04c4cf28e08e9e049bd8bf202d2
+# The same v0.6.0 profiles as installed by earlier Windows checkouts carry CRLF line
+# endings. Those exact byte sequences are historical too and may migrate; current
+# templates with changed line endings remain conflicts.
+legacy_luna_v060_crlf_sha256=000ff8bed7f94f77a460fb81424d51233eb6146db5b21a346068aceb6a9abe27
+legacy_terra_v060_crlf_sha256=7c9497c46207007565f72ac9bac6ce4954a1491914e4d64b44e27e4c27e8cd43
+legacy_sol_crlf_sha256=6ac63677bcc8677a9a743522cf06696c8edb1b005a61430e0fc8fa62e18dc355
 
 for template in "$luna_template" "$terra_template" "$sol_template"; do
   [ -f "$template" ] && [ ! -L "$template" ] ||
@@ -237,9 +243,9 @@ if path_exists "$target_dir"; then
   fi
 fi
 
-luna_state=$(classify_current_or_legacy "$luna_destination" "$luna_template" "$legacy_luna_sha256" "$legacy_luna_v050_sha256" "$legacy_luna_v060_sha256")
-terra_state=$(classify_current_or_legacy "$terra_destination" "$terra_template" "$legacy_terra_sha256" "$legacy_terra_v050_sha256" "$legacy_terra_v060_sha256")
-sol_state=$(classify_current_or_legacy "$sol_destination" "$sol_template" "$legacy_sol_sha256")
+luna_state=$(classify_current_or_legacy "$luna_destination" "$luna_template" "$legacy_luna_sha256" "$legacy_luna_v050_sha256" "$legacy_luna_v060_sha256" "$legacy_luna_v060_crlf_sha256")
+terra_state=$(classify_current_or_legacy "$terra_destination" "$terra_template" "$legacy_terra_sha256" "$legacy_terra_v050_sha256" "$legacy_terra_v060_sha256" "$legacy_terra_v060_crlf_sha256")
+sol_state=$(classify_current_or_legacy "$sol_destination" "$sol_template" "$legacy_sol_sha256" "$legacy_sol_crlf_sha256")
 
 if [ "$check_only" -eq 1 ]; then
   if role_selected luna; then
@@ -286,33 +292,33 @@ fi
 [ -d "$target_dir" ] && [ ! -L "$target_dir" ] ||
   fail "target directory changed after preflight: $target_dir"
 
-same_state Luna "$luna_state" "$(classify_current_or_legacy "$luna_destination" "$luna_template" "$legacy_luna_sha256" "$legacy_luna_v050_sha256" "$legacy_luna_v060_sha256")"
-same_state Terra "$terra_state" "$(classify_current_or_legacy "$terra_destination" "$terra_template" "$legacy_terra_sha256" "$legacy_terra_v050_sha256" "$legacy_terra_v060_sha256")"
-same_state Sol "$sol_state" "$(classify_current_or_legacy "$sol_destination" "$sol_template" "$legacy_sol_sha256")"
+same_state Luna "$luna_state" "$(classify_current_or_legacy "$luna_destination" "$luna_template" "$legacy_luna_sha256" "$legacy_luna_v050_sha256" "$legacy_luna_v060_sha256" "$legacy_luna_v060_crlf_sha256")"
+same_state Terra "$terra_state" "$(classify_current_or_legacy "$terra_destination" "$terra_template" "$legacy_terra_sha256" "$legacy_terra_v050_sha256" "$legacy_terra_v060_sha256" "$legacy_terra_v060_crlf_sha256")"
+same_state Sol "$sol_state" "$(classify_current_or_legacy "$sol_destination" "$sol_template" "$legacy_sol_sha256" "$legacy_sol_crlf_sha256")"
 
 case "$luna_state" in
   missing) install_missing "$luna_template" "$luna_destination" ;;
-  legacy) replace_legacy_role Luna "$luna_template" "$luna_destination" "$legacy_luna_sha256" "$legacy_luna_v050_sha256" "$legacy_luna_v060_sha256" ;;
+  legacy) replace_legacy_role Luna "$luna_template" "$luna_destination" "$legacy_luna_sha256" "$legacy_luna_v050_sha256" "$legacy_luna_v060_sha256" "$legacy_luna_v060_crlf_sha256" ;;
   current) printf '%s\n' "ALREADY CURRENT: $luna_destination" ;;
 esac
 
 case "$terra_state" in
   missing) install_missing "$terra_template" "$terra_destination" ;;
-  legacy) replace_legacy_role Terra "$terra_template" "$terra_destination" "$legacy_terra_sha256" "$legacy_terra_v050_sha256" "$legacy_terra_v060_sha256" ;;
+  legacy) replace_legacy_role Terra "$terra_template" "$terra_destination" "$legacy_terra_sha256" "$legacy_terra_v050_sha256" "$legacy_terra_v060_sha256" "$legacy_terra_v060_crlf_sha256" ;;
   current) printf '%s\n' "ALREADY CURRENT: $terra_destination" ;;
 esac
 
 case "$sol_state" in
   missing) install_missing "$sol_template" "$sol_destination" ;;
-  legacy) replace_legacy_role Sol "$sol_template" "$sol_destination" "$legacy_sol_sha256" ;;
+  legacy) replace_legacy_role Sol "$sol_template" "$sol_destination" "$legacy_sol_sha256" "$legacy_sol_crlf_sha256" ;;
   current) printf '%s\n' "ALREADY CURRENT: $sol_destination" ;;
 esac
 
-[ "$(classify_current_or_legacy "$luna_destination" "$luna_template" "$legacy_luna_sha256" "$legacy_luna_v050_sha256" "$legacy_luna_v060_sha256")" = current ] ||
+[ "$(classify_current_or_legacy "$luna_destination" "$luna_template" "$legacy_luna_sha256" "$legacy_luna_v050_sha256" "$legacy_luna_v060_sha256" "$legacy_luna_v060_crlf_sha256")" = current ] ||
   fail "post-install exactness check failed: $luna_destination"
-[ "$(classify_current_or_legacy "$terra_destination" "$terra_template" "$legacy_terra_sha256" "$legacy_terra_v050_sha256" "$legacy_terra_v060_sha256")" = current ] ||
+[ "$(classify_current_or_legacy "$terra_destination" "$terra_template" "$legacy_terra_sha256" "$legacy_terra_v050_sha256" "$legacy_terra_v060_sha256" "$legacy_terra_v060_crlf_sha256")" = current ] ||
   fail "post-install exactness check failed: $terra_destination"
-[ "$(classify_current_or_legacy "$sol_destination" "$sol_template" "$legacy_sol_sha256")" = current ] ||
+[ "$(classify_current_or_legacy "$sol_destination" "$sol_template" "$legacy_sol_sha256" "$legacy_sol_crlf_sha256")" = current ] ||
   fail "post-install exactness check failed: $sol_destination"
 
 printf '%s\n' "INSTALL PASSED: Luna, Terra, and Sol exactly match $template_dir."

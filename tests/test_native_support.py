@@ -216,6 +216,21 @@ class NativeSupportTests(unittest.TestCase):
             self.install()
             self.install(check=True)
 
+    def test_historical_crlf_windows_profiles_migrate(self):
+        source = HELPER.with_name("verify.sh")
+        if not source.exists():
+            self.skipTest("Upstream fixture source not available")
+        text = source.read_text(encoding="utf-8")
+        markers = {"luna": "V060_LUNA", "terra": "V060_TERRA", "sol": "LEGACY_SOL"}
+        self.target.mkdir(parents=True, exist_ok=True)
+        for role, marker in markers.items():
+            data = text.split("<<'" + marker + "'\n", 1)[1].split("\n" + marker, 1)[0].encode() + b"\n"
+            crlf = data.replace(b"\n", b"\r\n")
+            self.assertIn(hashlib.sha256(crlf).hexdigest(), core.LEGACY[role])
+            (self.target / core.FILES[role]).write_bytes(crlf)
+        self.install()
+        self.install(check=True)
+
     def test_runtime_allowlist_and_no_payload_leakage(self):
         self.rollout()
         result = self.cli("inspect", "--sessions-dir", str(self.sessions), THREAD)
