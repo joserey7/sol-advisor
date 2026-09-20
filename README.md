@@ -13,14 +13,30 @@ I write [**Attention Heads**](https://attentionheads.substack.com/?utm_source=gi
 
 ## Quick start
 
-You need a current Codex CLI or ChatGPT desktop app with plugins enabled, GPT-5.6
-Sol / xhigh for the primary session, native custom-agent support, and jq. GPT-5.6
+This fork preserves Daniel McAteer's [upstream project](https://github.com/DannyMac180/sol-advisor) and adds native Windows support.
+
+You need a current Codex CLI with plugins and native custom-agent support; use the
+same Codex home as Codex Desktop. Select GPT-5.6 Sol / xhigh in the primary session.
 Luna / Max or Terra / Max access is needed only when the selected route delegates.
 
+### Windows (native PowerShell)
+
+Requires PowerShell 5.1+ and Python 3.11+; no Bash, WSL, or jq. From a reviewed clone
+of this fork, run the following to register the plugin and install its companion roles:
+
+~~~powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install-plugin.ps1
+~~~
+
+See the [Windows installation and troubleshooting guide](plugins/sol-advisor/skills/orchestration/references/windows.md).
+The execution-policy option applies only to this process. Do not change a managed policy.
+
+### macOS / Linux (POSIX shell and jq)
+
 ~~~sh
-codex plugin marketplace add DannyMac180/sol-advisor --ref main
-codex plugin add sol-advisor@sol-advisor
-plugin_dir="$(codex plugin list --json | jq -r '.installed[] | select(.pluginId == "sol-advisor@sol-advisor") | .source.path')" && test -n "$plugin_dir" && test "$plugin_dir" != null && test -d "$plugin_dir" && test -f "$plugin_dir/scripts/install-agents.sh" && sh "$plugin_dir/scripts/install-agents.sh"
+codex plugin marketplace add joserey7/sol-advisor --ref main
+codex plugin add sol-advisor@sol-advisor-joserey7
+plugin_dir="$(codex plugin list --json | jq -r '.installed[] | select(.pluginId == "sol-advisor@sol-advisor-joserey7") | .source.path')" && test -n "$plugin_dir" && test "$plugin_dir" != null && test -d "$plugin_dir" && test -f "$plugin_dir/scripts/install-agents.sh" && sh "$plugin_dir/scripts/install-agents.sh"
 ~~~
 
 The companion installer verifies all three exact role files after installation. It is
@@ -64,12 +80,13 @@ xhigh reviewer returns ship, fix-first, or rethink; any fix requires a new revie
 
 ## Updating
 
-Update the marketplace plugin, reinstall the companion roles, and start a new task:
+On Windows, run `powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install-plugin.ps1 -Update`.
+On macOS/Linux, update the plugin and companion roles below. Then start a new task:
 
 ~~~sh
-codex plugin marketplace upgrade sol-advisor
-codex plugin add sol-advisor@sol-advisor
-plugin_dir="$(codex plugin list --json | jq -r '.installed[] | select(.pluginId == "sol-advisor@sol-advisor") | .source.path')" && test -n "$plugin_dir" && test "$plugin_dir" != null && test -d "$plugin_dir" && test -f "$plugin_dir/scripts/install-agents.sh" && sh "$plugin_dir/scripts/install-agents.sh"
+codex plugin marketplace upgrade sol-advisor-joserey7
+codex plugin add sol-advisor@sol-advisor-joserey7
+plugin_dir="$(codex plugin list --json | jq -r '.installed[] | select(.pluginId == "sol-advisor@sol-advisor-joserey7") | .source.path')" && test -n "$plugin_dir" && test "$plugin_dir" != null && test -d "$plugin_dir" && test -f "$plugin_dir/scripts/install-agents.sh" && sh "$plugin_dir/scripts/install-agents.sh"
 ~~~
 
 For exact spawn, runtime-evidence, sandbox, installer, and maintainer verification
@@ -79,5 +96,5 @@ For local development, install this checkout as a marketplace:
 ~~~sh
 cd /absolute/path/to/sol-advisor
 codex plugin marketplace add /absolute/path/to/sol-advisor
-codex plugin add sol-advisor@sol-advisor
+codex plugin add sol-advisor@sol-advisor-joserey7
 ~~~

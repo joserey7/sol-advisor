@@ -1,0 +1,6 @@
+# Exact template checks and legacy digests must not drift with core.autocrlf.
+* text=auto
+*.toml text eol=lf
+*.sh text eol=lf
+*.ps1 text eol=lf
+*.py text eol=lf
