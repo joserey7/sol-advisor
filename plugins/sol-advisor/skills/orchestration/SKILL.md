@@ -1,112 +1,114 @@
 ---
 name: orchestration
-description: "Codex-native risk-gated selective routing: default solo delivery, targeted native delegation or audit, and exceptional full review."
+description: "Codex-native selective delivery with GPT-6 Sol and Luna; explicitly authorized Astra decision advice is optional."
 ---
 
 # Sol Advisor Orchestration
 
-Act as the architect. Own the user's intent, architecture, route choice, decomposition,
-implementation or delegation, parent verification, escalation decisions, and final
-acceptance. Selective routing has four exact modes: `solo`, `delegate`, `audit`, and
-`full`. Solo is the default. One auxiliary agent is the default maximum; full is an
-explicit broad or high-risk exception.
+Own intent, architecture, route selection, verification, and acceptance in the primary
+GPT-6 Sol / xhigh session. Default to `solo`; normally use at most one auxiliary.
+Keep the four delivery modes `solo`, `delegate`, `audit`, and exceptional `full`.
+Astra is an optional decision consultation, not a fifth mode or a routine pipeline step.
 
-Read [references/role-contracts.md](references/role-contracts.md) before the first
-delegation. Use [references/operations.md](references/operations.md) for exact spawn,
-preflight, runtime-evidence, isolation, and maintainer procedures.
+## Discover, then confirm
 
-On native Windows, use [references/windows.md](references/windows.md) for the
-PowerShell companion commands instead of the POSIX examples. Resolve helpers from
-the installed skill directory, not the working repository. Do not fall back to WSL
-or change Codex homes when a native preflight fails.
-
-## Confirm the primary session
-
-Run the primary Codex session on gpt-5.6-sol with xhigh reasoning. Verify the current
-model and effort when runtime metadata exposes them. If either differs, tell the user
-to select Sol / xhigh and stop before delegation. If runtime metadata does not expose
-them, ask the user to confirm Sol / xhigh and stop until confirmed. A skill cannot
-change the primary model itself; never assume or claim this prerequisite is satisfied.
-
-## Declare the route before task tools
-
-Before the first task tool call, emit one machine-auditable declaration:
+Before task tools, emit a provisional declaration, or a confirmed one when sufficient
+evidence is already available:
 
 ~~~text
 SELECTIVE ROUTE
+phase: provisional | confirmed
 mode: solo | delegate | audit | full
-risk: <concise, task-specific rationale>
+difficulty: bounded | judgment-heavy
+risk: contained | material
+worker: none | luna | sol-implementer
+reason: <task-specific evidence and expected benefit>
 ~~~
 
-No task tool call may precede this declaration. Choose `solo` unless a stated risk
-justifies another mode. A later declaration may only escalate the route when newly
-observed risk justifies it; never silently downgrade. Record the evidence for an
-escalation. Details and the task-scoped preflight matrix are in operations.md.
+Provisional discovery is bounded and read-only: locate the affected behavior,
+interfaces, tests, and consequence risks. Do not implement, spawn agents, or expand
+into an unbounded repository survey. Confirm the route before the first edit or spawn.
+A provisional route can change in either direction as evidence improves. After
+confirmation, record new evidence before changing the plan; do not silently remove a
+required review. A material-risk review can be removed only with explicit user approval
+and evidence that the risk was eliminated, not merely to save credits.
 
-## Preflight selected auxiliaries only
+Verify primary model and effort through available runtime metadata. The required pin
+is `gpt-6-sol` / `xhigh`. If unavailable, ask for user confirmation; if conflicting,
+request the correct session and stop before implementation or delegation. A skill
+cannot change the primary model. Never pretend metadata or access was observed.
 
-Confirm Sol / xhigh in the primary session. Preflight only an auxiliary selected by the
-declared route: none for solo; Luna / Max or Terra / Max for delegate; fresh Sol / xhigh
-for audit; and the selected implementer plus fresh Sol reviewer for full. Public metadata
-for role, model, and effort is authoritative. If it omits a model or effort, use the
-local inspector only for that omitted field. Missing, conflicting, unavailable, or
-unobservable evidence stops the affected lane; never silently substitute a role,
-model, effort, or reviewer.
+## Separate capability, consequence risk, and delegation benefit
 
-## Route delivery without duplication
+Use Luna / max for fully specified bounded work. Use Sol / xhigh for judgment-heavy
+implementation within settled architecture. Volume alone does not require Sol;
+small changes can still have material consequences. Terra is retired, never a fallback.
 
-- `solo`: root plans, implements, tests, and self-reviews; spawn no auxiliary.
-- `delegate`: select Luna / Max for bounded, fully specified work, or Terra / Max for
-  judgment-heavy, high-risk, context-heavy, or wide-blast-radius work. The selected
-  implementer executes the complete spec; root verifies; do not request a fresh review.
-- `audit`: root implements and verifies; a fresh read-only Sol / xhigh reviewer reviews
-  the accumulated diff; spawn no implementer.
-- `full`: only for an explicit broad or high-risk exception. Select one implementer,
-  root verifies, then a fresh read-only Sol / xhigh reviewer reviews.
+- `solo`: primary plans, implements, tests, and self-reviews; no delivery auxiliary.
+- `delegate`: one Luna or Sol implementer executes; primary verifies. Use only when
+  delegating replaces meaningful work or context, and consequence risk is contained.
+- `audit`: primary implements and verifies, then a fresh read-only Sol reviews.
+- `full`: explicitly justified broad or material-risk exception: one implementer,
+  primary verification, then fresh read-only Sol review.
 
-Auxiliary work must substitute for root work, not duplicate it. A Luna result may
-justify escalation to Terra / Max only when it reveals newly observed complexity,
-risk, wide blast radius, or misclassification. A corrected Luna attempt is reserved
-for a specification error and is not a prerequisite for Terra. Any route change must
-be declared and evidenced; do not silently downgrade.
+Material consequence risk requires `audit` or `full`, regardless of diff size or worker
+model. Consider data loss, permissions, irreversible migrations, cross-cutting
+invariants, reversibility, and verification strength. Delegation is not obligatory:
+when the primary already has the context, direct Sol implementation may be cheaper.
+Do not create permanent explorer/tester/planner chains or duplicate worker execution.
 
-## Keep architect work in the primary session
+## Delegate with a complete contract
 
-Keep these responsibilities in the primary session:
+Read [role-contracts.md](references/role-contracts.md) before the first delegation.
+Use [operations.md](references/operations.md) for selected-role checks, the confirmed
+plan validator, exact spawn syntax, runtime evidence, and observed isolation. On native
+Windows use [windows.md](references/windows.md); never fall back to WSL or another home.
+Resolve helpers from the installed skill, not the working repository.
 
-- Resolve requirements and material ambiguity.
-- Choose architecture, interfaces, decomposition, and selective route.
-- Write the complete five-part worker specification for any selected implementer.
-- Inspect the actual diff and rerun verification.
-- Decide whether newly observed risk warrants escalation.
-- Judge the reviewer verdict when the route includes review and accept the deliverable.
+Before any auxiliary spawn, validate the declared confirmed plan with `check-plan` and
+preflight only its selected roles. Normal solo needs no companion checks. The validator
+checks declarations, not their truth; verify actual user authorization and evidence.
+Missing, conflicting, unsafe, unavailable, or unobservable selected model/effort/role
+stops that lane. Never silently substitute. Installation is not proof of model access.
 
-Every worker prompt must contain OBJECTIVE, FILES AND OWNERSHIP, INTERFACES,
-CONSTRAINTS, VERIFICATION, and the structured implementation return in
-[the role contracts](references/role-contracts.md). State the exact owned files,
-preserve concurrent edits, and never silently widen scope.
+Every worker packet contains OBJECTIVE, FILES AND OWNERSHIP, INTERFACES, CONSTRAINTS,
+VERIFICATION, and the structured implementation return. Preserve concurrent edits and
+exact ownership. The primary inspects the actual accumulated diff, scope, and artifacts,
+and reruns requested verification. Worker reports are claims, not acceptance evidence.
 
-Treat worker reports as claims. Confirm the complete diff, changed-file scope, requested
-checks, and artifact/runtime evidence in the parent session. Do not duplicate the
-selected implementer's work in the primary session.
+New complexity can justify moving from Luna to Sol immediately; do not force failed
+retries. Correct a specification error with a precise amended contract. Do not repeatedly
+retry an unchanged plan. A separate Sol implementer is not the final Sol reviewer.
 
-## Review only when the route includes it
+## Review without duplication
 
-For `audit` and `full`, after parent verification, spawn a new native Sol / xhigh
-reviewer. The reviewer must remain behaviorally read-only, inspect the actual
-accumulated diff, and return exactly ship, fix-first, or rethink. A reviewer never
-implements its own fixes. `solo` and `delegate` do not receive a fresh reviewer.
+For `audit` and `full`, after primary verification, spawn a new Sol / xhigh reviewer
+with fresh context. It inspects the complete accumulated diff and remains read-only.
+Use observed permissions, not requested permissions. Return `ship`, `fix-first`, or
+`rethink`. A reviewer never implements its own findings. A Sol review is context-clean,
+not cross-model-family independence.
 
-- ship: report completion with the verification evidence.
-- fix-first applies only to `audit` and `full`:
-  - audit: the root implements the required correction, re-verifies, and obtains a new
-    fresh reviewer.
-  - full: the selected implementer handles the required correction, the root
-    re-verifies, and a new fresh reviewer reviews.
-  - solo and delegate: no fresh reviewer is added unless a newly observed,
-    risk-evidenced route escalation is declared; never silently add one.
-- rethink: revise the architecture and do not report completion.
+`fix-first`: primary fixes in audit, selected implementer fixes in full. Re-verify and
+obtain a new fresh review. Any implementation correction invalidates the prior verdict.
+`rethink`: revise the design; do not claim completion. Solo/delegate receive no fresh
+review unless a declared route change requires one. Never report unrun checks as passed.
 
-Any implementation correction invalidates the prior verdict. Apply the observed sandbox
-and permission profile rules in the operations reference; never claim enforced
-read-only isolation when it was not observed.
+## Consult Astra only by explicit exception
+
+Astra / high is off by default and not installed with the core roles. Read
+[astra-advice.md](references/astra-advice.md) before proposing its use. Require explicit
+user authorization for one bounded consequential decision and consultation. Installation,
+model availability, full mode, task size, or ordinary failed tests are not authorization.
+
+Qualifying triggers: consequential irreversible uncertainty, a structural disagreement,
+or an evidence-backed diagnostic blocker. Do not force Luna/Sol failures first when the
+risk is already clear. Provide alternatives, constraints, evidence and counterevidence,
+and required checks; no undirected whole-repository review.
+
+Astra remains read-only, never implements, never spawns agents, and never replaces a
+required Sol review. Sol retains the decision and acceptance. A repeat consultation
+requires renewed explicit authorization. Its additional auxiliary is a recorded exception
+to the normal limit. One consultation can contain multiple model calls: this is a
+workflow authorization policy, not a hard token/credit cap or an enforced sandbox.
+If Astra is declined or unavailable, continue safely with Sol only where the uncertainty
+permits; otherwise report the unresolved decision without claiming completion.

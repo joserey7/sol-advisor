@@ -6,18 +6,20 @@ Register this fork as a Codex plugin and install the companion native agents.
 Requires a current native Codex CLI and Python 3.11+. Defaults to this checkout,
 not the current working directory. Does not modify model/sandbox settings or
 execution policy. Use the same CODEX_HOME as Codex Desktop, then start a new task.
+-WithAstra installs the optional profile, not permission to use it.
 .EXAMPLE
 .\scripts\install-plugin.ps1
 .EXAMPLE
 .\scripts\install-plugin.ps1 -Source joserey7/sol-advisor -Ref main
 .EXAMPLE
-.\scripts\install-plugin.ps1 -Update
+.\scripts\install-plugin.ps1 -Update -WithAstra
 #>
 [CmdletBinding()]
 param(
     [ValidateNotNullOrEmpty()][string] $Source,
     [ValidateNotNullOrEmpty()][string] $Ref,
     [switch] $Update,
+    [switch] $WithAstra,
     [ValidateNotNullOrEmpty()][string] $CodexCommand
 )
 $ErrorActionPreference = 'Stop'
@@ -68,9 +70,11 @@ try {
     $helper = Join-Path $pluginPath 'scripts/native-support.py'
     if (-not (Test-Path -LiteralPath $helper -PathType Leaf)) { throw 'Installed plugin is missing its shell-free companion installer.' }
     # Use the installed bundle, not potentially different templates in this checkout.
-    & $python.Executable @prefix $helper install
+    $installArguments = @('install')
+    if ($WithAstra) { $installArguments += '--with-astra' }
+    & $python.Executable @prefix $helper @installArguments
     if ($LASTEXITCODE -ne 0) { throw 'Plugin is registered, but companion installation failed. Resolve the reported conflict; do not overwrite customized files blindly.' }
-    Write-Output 'PLUGIN INSTALL PASSED. Restart Codex Desktop and start a NEW task; select Sol / xhigh in the primary session.'
+    Write-Output 'PLUGIN INSTALL PASSED. Restart Codex Desktop and start a NEW task; select GPT-6 Sol / xhigh in the primary session.'
     exit 0
 } catch {
     [Console]::Error.WriteLine('ERROR: ' + $_.Exception.Message)

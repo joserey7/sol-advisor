@@ -1,156 +1,93 @@
 # Native Windows installation and operations
 
-This fork adds PowerShell entry points backed by Python's standard library. It does
-not require sh, Bash, WSL, jq, or third-party Python packages on native Windows.
-The POSIX scripts remain available on macOS/Linux. Model/effort contracts, selected
-routes, fresh-review rules, and the reviewer sandbox request are unchanged.
+Use PowerShell 5.1+ and Python 3.11+ with the same Codex home as the desktop app.
+No Bash, WSL, jq, third-party Python packages, or persistent execution-policy change
+is required. Do not fall back to WSL, another home, or another model after a failure.
 
-## Prerequisites and Desktop setup
+## Install and update
 
-Use Windows PowerShell 5.1 or PowerShell 7, native Python 3.11+, and a current native
-Codex CLI exposing `codex plugin`. The CLI and Codex Desktop must use the same
-`CODEX_HOME`. Without an override, the native helpers use
-`$env:USERPROFILE\.codex`; they do not use a WSL home. Git is needed to clone the
-repository. Python is checked before the installer makes registration changes.
-
-The plugin is packaged using `.agents/plugins/marketplace.json` and
-`plugins/sol-advisor/.codex-plugin/plugin.json`. Installing it through the CLI uses
-the Codex plugin mechanism; it does not turn it into a loose skill. Companion agent
-registration is an additional step performed by this repository's installer.
-Desktop integration still requires a supported Desktop build and a fresh task.
-
-From a PowerShell terminal, after reviewing this fork's code:
+From a reviewed clone of `joserey7/sol-advisor`:
 
 ~~~powershell
-git clone https://github.com/joserey7/sol-advisor.git
-Set-Location sol-advisor
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install-plugin.ps1
-~~~
-
-To test a pull request before merge, check out its branch before running the script.
-The default marketplace source is the script's own checkout, not the terminal's
-current directory. `-ExecutionPolicy Bypass` is process-scoped and does not edit the
-machine policy; do not work around an organization-enforced policy.
-
-The installer registers `sol-advisor-joserey7`, installs
-`sol-advisor@sol-advisor-joserey7`, resolves that exact ID using `codex plugin list
---json`, validates its source directory and fork manifest, then installs the exact
-companion templates from the **installed bundle**, not a guessed cache directory.
-It stops on CLI errors, invalid JSON, missing or duplicate matches, or conflicts.
-If plugin registration succeeds but companions fail, it reports that partial state.
-
-Restart Codex Desktop and start a new task so the custom-agent types can be discovered.
-Select Sol / xhigh in the primary session, then use:
-
-~~~text
-Use $sol-advisor:orchestration to build this feature and verify it. Declare the selective route before task tools.
-~~~
-
-The fork has a distinct marketplace identity but retains the skill name and three
-role filenames. If the upstream plugin is also installed, disable that other copy
-in Codex's plugin controls before using the fork, avoiding duplicate skills. The
-installer does not disable other plugins or overwrite customized agent files.
-
-## Remote source and updates
-
-After the Windows changes are merged into this fork's main branch, an existing
-checkout can instead register the remote marketplace explicitly:
-
-~~~powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install-plugin.ps1 -Source joserey7/sol-advisor -Ref main
-~~~
-
-Update the registered marketplace and companion roles with:
-
-~~~powershell
+# Later, update the installed marketplace and core profiles:
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install-plugin.ps1 -Update
 ~~~
 
-For a local marketplace, update that checkout first. `-Update` cannot be combined
-with `-Source` or `-Ref`. Every install/update must be followed by a new task. The
-script never edits Codex model, effort, sandbox, or approval settings. Custom
-`CODEX_HOME` values must already be present in both the CLI and Desktop processes;
-setting one only in a terminal does not change an already-running Desktop process.
+This process-only execution-policy option does not override managed organization policy.
+The bootstrap finds the exact installed plugin and installs its cached profiles, not
+potentially different templates from the working checkout. It never edits Codex model,
+sandbox, or default-agent settings. Restart the app and start a NEW task on GPT-6 Sol /
+xhigh. Check selected auxiliary access at runtime; installed files are not proof of access.
 
-## Native companion operations
-
-From a repository checkout, these examples use its scripts:
+The default bundle installs Luna implementation, Sol implementation, and Sol review.
+Astra is optional. To install its profile explicitly:
 
 ~~~powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\plugins\sol-advisor\scripts\install-agents.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install-plugin.ps1 -Update -WithAstra
+~~~
+
+`-WithAstra` installs only; it never authorizes paid use. Every consultation follows
+[astra-advice.md](astra-advice.md). Use `-WithAstra` on updates to keep an opted-in
+profile current; default updates ignore the optional role.
+
+## Companion checks
+
+In a checkout, or substituting the scripts directory of the installed plugin:
+
+~~~powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\plugins\sol-advisor\scripts\install-agents.ps1 -Check
-powershell -NoProfile -ExecutionPolicy Bypass -File .\plugins\sol-advisor\scripts\install-agents.ps1 -CheckRole luna
+# Sol implementer, NOT the reviewer:
+powershell -NoProfile -ExecutionPolicy Bypass -File .\plugins\sol-advisor\scripts\install-agents.ps1 -CheckRole sol-implementer
+# The legacy sol check alias still means the reviewer:
+powershell -NoProfile -ExecutionPolicy Bypass -File .\plugins\sol-advisor\scripts\install-agents.ps1 -CheckRole sol
 ~~~
 
-For an installed skill, `$skillDir` must be the actual directory containing this
-skill's `SKILL.md`. Resolve the scripts from that directory, never from an unrelated
-working repository. In an existing PowerShell session:
+Direct script invocation supports `-CheckRole luna,sol` arrays; when using `-File`, check
+one role at a time or call Python with repeated `--check-role`. `-TargetDir` overrides
+`CODEX_HOME\agents` / `USERPROFILE\.codex\agents`. Checks never create missing roles.
+
+## Plan validation and runtime inspection
+
+When operating from the installed skill, use its helper and resolve Python with the
+bundled `python-common.ps1` (prefers a compatible native Python):
 
 ~~~powershell
-$skillDir = 'C:\actual\installed\plugin\skills\orchestration'
-$installer = Join-Path $skillDir '..\..\scripts\install-agents.ps1'
-& $installer -CheckRole luna,sol
+$skillDir = '<directory containing the installed SKILL.md>'
+$scripts = [IO.Path]::GetFullPath((Join-Path $skillDir '..\..\scripts'))
+. (Join-Path $scripts 'python-common.ps1')
+$python = Get-SolAdvisorPython
+$prefix = @($python.Prefix)
+$helper = Join-Path $scripts 'native-support.py'
+'{"mode":"audit","difficulty":"judgment-heavy","risk":"material"}' |
+    & $python.Executable @prefix $helper check-plan
+& $python.Executable @prefix $helper install --check-role sol
+& $python.Executable @prefix $helper inspect --expect-role sol --require-read-only '<native-thread-uuid>'
 ~~~
 
-Use `-CheckRole luna` or `terra` for delegate, `-CheckRole sol` for audit, and
-`-CheckRole luna,sol` or `terra,sol` for full. Solo has no companion preflight.
-`-Check` validates all three; `-CheckRole` implies a non-mutating selective check.
-Pass arrays inside PowerShell as above, not as a comma-delimited single string to
-`powershell.exe -File`. A process-level alternative with repeated flags is:
+The existing `inspect-agent-runtime.ps1 -ThreadId ... -SessionsDir ...` remains a
+metadata-only convenience wrapper. Use the Python invocation above for expected-role
+and hard-isolation assertions. Runtime checks must follow public metadata precedence
+and the actual-isolation rules in [operations.md](operations.md).
 
-~~~powershell
-python .\plugins\sol-advisor\scripts\native-support.py install --check-role luna --check-role sol
-~~~
+## Migration and troubleshooting
 
-An explicit `-TargetDir 'C:\custom home\agents'` overrides the default. Check-only
-mode never creates that directory. Filenames and contents are compared exactly:
-manual edits, line-ending changes, links, junctions, other reparse points, and
-nonregular destinations are not silently repaired. Only known byte-exact historical
-Luna/Terra profiles are automatically migrated. `.gitattributes` pins template line
-endings to LF for Windows clones. Keep backups and resolve a reported conflict
-manually; there is no force-overwrite option. Checks are cached only for the task,
-as specified in [operations.md](operations.md).
+Exact recognized v0.7.0 Luna/Sol files migrate to GPT-6. Older immutable fingerprints,
+including v0.6.0 CRLF Windows variants, remain supported. Exact Terra files are archived
+under the sibling `sol-advisor-retired` directory; customized files remain untouched
+with a warning. Review and move retained Terra files outside the agents directory;
+this skill never selects them, but their presence can affect other Codex workflows.
 
-## Runtime evidence fallback
+A conflicting active profile, symlink, junction, or conflicting retirement archive is
+not permission to overwrite it. Back up and inspect the reported file; do not normalize
+all line endings, delete a whole Codex home, or reset global config. New current CRLF
+profiles remain conflicts, not automatic migrations. Do not run concurrent installers.
 
-Use public routing evidence first. When model or effort is absent from that public
-record, inspect only the exact native thread ID using the bundled helper:
+For CLI-not-found errors, supply `-CodexCommand` with the native executable/CMD shim.
+For Python errors, install a compatible native interpreter; the launcher supports `py`
+and `python` without silently selecting an unsupported version. Marketplace/bootstrap
+failures stop companion changes and report their stage. Start a new task after success
+so old discovered roles are not reused.
 
-~~~powershell
-$inspector = Join-Path $skillDir '..\..\scripts\inspect-agent-runtime.ps1'
-& $inspector -ThreadId '00000000-0000-0000-0000-000000000001'
-~~~
-
-Replace the example UUID with the actual native thread ID. `-SessionsDir` overrides
-the sessions root for a fixture or another explicitly selected home. The helper
-selects exactly one rollout filename, validates consistent metadata, and prints
-only the ten allowlisted routing fields. It does not dump messages, prompts,
-credentials, environment variables, or arbitrary payloads. Invalid IDs, missing or
-ambiguous files, invalid JSON, or inconsistent evidence are failures, not permission
-to choose another model. Apply the same reviewer-isolation rules as operations.md.
-
-## Troubleshooting and verification
-
-If `codex` is not found, install the native Codex CLI or supply
-`-CodexCommand 'C:\path\to\codex.exe'`. The Desktop application alone does not
-necessarily put its CLI on PATH. An unsupported `codex plugin` command is a client
-prerequisite failure, not a reason to copy a guessed cache path. If Python discovery
-fails, install Python 3.11+ and make `python` or the `py` launcher available.
-
-Maintainers can run the shell-free tests from the repository root:
-
-~~~powershell
-python -m unittest discover -s tests -v
-powershell -NoProfile -ExecutionPolicy Bypass -File .\tests\verify-windows.ps1
-pwsh -NoProfile -File .\tests\verify-windows.ps1
-~~~
-
-CI includes Windows PowerShell 5.1 and PowerShell 7, Python 3.11/3.13, and the existing
-Linux POSIX regression suite. The PowerShell bootstrap tests use a fake CLI and
-disposable homes; they do not authenticate or run real model sessions. CI success
-is not a live Desktop end-to-end test. A release should additionally record an
-actual Desktop install, restart/new task, and selected-role preflight on Windows.
-
-Official context: [Codex on Windows](https://developers.openai.com/codex/app/windows),
-[plugins](https://developers.openai.com/codex/plugins), and
-[plugin packaging](https://developers.openai.com/plugins/build/plugins).
+CI runs the portable suite and native wrappers with both PowerShell engines and Python
+versions. This does not replace a live Codex smoke test on the target Windows installation.

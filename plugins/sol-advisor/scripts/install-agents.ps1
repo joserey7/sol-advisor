@@ -1,15 +1,18 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-Install exact companion roles, or check selected roles without changing anything.
+Install core companion roles, or check selected roles without changing anything.
 .EXAMPLE
 .\install-agents.ps1 -CheckRole luna,sol
+.EXAMPLE
+.\install-agents.ps1 -WithAstra
 #>
 [CmdletBinding()]
 param(
     [ValidateNotNullOrEmpty()][string] $TargetDir,
     [switch] $Check,
-    [ValidateSet('luna', 'terra', 'sol')][string[]] $CheckRole
+    [switch] $WithAstra,
+    [ValidateSet('luna', 'sol-implementer', 'sol', 'astra')][string[]] $CheckRole
 )
 $ErrorActionPreference = 'Stop'
 try {
@@ -19,6 +22,7 @@ try {
     $arguments = @('install')
     if ($PSBoundParameters.ContainsKey('TargetDir')) { $arguments += @('--target-dir', $TargetDir) }
     if ($Check) { $arguments += '--check' }
+    if ($WithAstra) { $arguments += '--with-astra' }
     foreach ($role in $CheckRole) { $arguments += @('--check-role', $role) }
     & $python.Executable @prefix (Join-Path $PSScriptRoot 'native-support.py') @arguments
     exit $LASTEXITCODE
