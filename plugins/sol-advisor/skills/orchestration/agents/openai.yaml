@@ -1,4 +1,4 @@
 interface:
   display_name: "Sol Advisor Orchestration"
-  short_description: "Declare a risk-gated solo, delegate, audit, or exceptional full route before task tools"
-  default_prompt: "Use $orchestration to declare a SELECTIVE ROUTE before task tools; default to solo and select delegation, audit, or exceptional full only when risk justifies it."
+  short_description: "Selective GPT-6 Sol/Luna delivery; Astra advice only with explicit authorization"
+  default_prompt: "Use $orchestration to declare a SELECTIVE ROUTE, inspect before confirming it, and build and verify with GPT-6 Sol/Luna. Do not use Astra without explicit user authorization."

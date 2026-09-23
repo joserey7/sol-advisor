@@ -16,8 +16,7 @@ function Assert-True($Condition, [string] $Message) {
     if (-not $Condition) { throw $Message }
 }
 function Run-Script([string] $Path, [string[]] $Arguments, [bool] $Success) {
-    # PS 5.1 redirects native stderr as ErrorRecords; expected failure fixtures must
-    # be checked by exit code rather than terminating on their diagnostics.
+    # PS 5.1 redirects native stderr as ErrorRecords; use exit codes for failures.
     $previousPreference = $ErrorActionPreference
     try {
         $ErrorActionPreference = 'Continue'
@@ -28,7 +27,6 @@ function Run-Script([string] $Path, [string[]] $Arguments, [bool] $Success) {
     return ($output -join "`n")
 }
 try {
-    # Parse every shipped PS1, including scripts that are only used on failure paths.
     Get-ChildItem -LiteralPath $repo -Recurse -Filter '*.ps1' | ForEach-Object {
         $tokens = $null; $errors = $null
         [void][System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$tokens, [ref]$errors)
@@ -39,25 +37,33 @@ try {
     $null = Run-Script $installer @() $true
     $null = Run-Script $installer @('-Check') $true
     $agents = Join-Path $env:CODEX_HOME 'agents'
-    Remove-Item -LiteralPath (Join-Path $agents 'sol-advisor-terra-implementer.toml')
+    $astra = Join-Path $agents 'sol-advisor-astra-advisor.toml'
+    Assert-True (-not (Test-Path -LiteralPath $astra)) 'Core installation enabled Astra.'
+    $null = Run-Script $installer @('-CheckRole', 'astra') $false
+    $null = Run-Script $installer @('-WithAstra') $true
+    $null = Run-Script $installer @('-CheckRole', 'astra') $true
+    Remove-Item -LiteralPath $astra
+    $null = Run-Script $installer @('-Check') $true
+    Remove-Item -LiteralPath (Join-Path $agents 'sol-advisor-sol-implementer.toml')
     $null = Run-Script $installer @('-CheckRole', 'luna') $true
     $null = Run-Script $installer @('-Check') $false
-    Assert-True (-not (Test-Path -LiteralPath (Join-Path $agents 'sol-advisor-terra-implementer.toml'))) 'Check recreated a missing role.'
+    Assert-True (-not (Test-Path -LiteralPath (Join-Path $agents 'sol-advisor-sol-implementer.toml'))) 'Check recreated a missing role.'
     $null = Run-Script $installer @('-CheckRole', 'unknown') $false
+    $null = Run-Script $installer @('-CheckRole', 'terra') $false
 
     $thread = '00000000-0000-0000-0000-000000000001'
     $sessions = Join-Path $temp 'sessions'
     [IO.Directory]::CreateDirectory($sessions) | Out-Null
     $rows = @(
         '{"type":"session_meta","payload":{"id":"00000000-0000-0000-0000-000000000001","agent_role":"sol_advisor_luna_implementer","prompt":"PRIVATE_SENTINEL"}}',
-        '{"type":"turn_context","payload":{"model":"gpt-5.6-luna","effort":"max","cwd":"C:/project"}}'
+        '{"type":"turn_context","payload":{"model":"gpt-6-luna","effort":"max","cwd":"C:/project"}}'
     )
     [IO.File]::WriteAllText((Join-Path $sessions ('rollout-test-' + $thread + '.jsonl')), ($rows -join "`n"), [Text.UTF8Encoding]::new($false))
     $result = Run-Script (Join-Path $scripts 'inspect-agent-runtime.ps1') @('-SessionsDir', $sessions, '-ThreadId', $thread) $true
     Assert-True (-not $result.Contains('PRIVATE_SENTINEL')) 'Runtime output leaked private data.'
     Assert-True (($result | ConvertFrom-Json).effort -ceq 'max') 'Runtime wrapper lost metadata.'
 
-    # Mock the CLI, not Codex itself: no authentication, model calls, or real home writes.
+    # Mock the CLI only: no authentication, model calls, or real home writes.
     . (Join-Path $scripts 'python-common.ps1')
     $python = Get-SolAdvisorPython
     $prefix = @($python.Prefix)
@@ -105,6 +111,10 @@ if args == ['plugin', 'list', '--json']:
     $calls = @(Get-Content -LiteralPath $env:FAKE_LOG | ForEach-Object { ,(ConvertFrom-Json $_) })
     Assert-True (@($calls | Where-Object { $_.Count -eq 4 -and $_[0] -eq 'plugin' -and $_[2] -eq 'add' -and $_[3] -ceq $sourcePath }).Count -eq 1) 'Source path argument was corrupted.'
     $null = Run-Script $bootstrap @('-CodexCommand', $fakeCmd, '-Update') $true
+    $installedAstra = Join-Path $env:CODEX_HOME 'agents/sol-advisor-astra-advisor.toml'
+    Assert-True (-not (Test-Path -LiteralPath $installedAstra)) 'Bootstrap installed Astra without opt-in.'
+    $null = Run-Script $bootstrap @('-CodexCommand', $fakeCmd, '-Update', '-WithAstra') $true
+    Assert-True (Test-Path -LiteralPath $installedAstra -PathType Leaf) 'Bootstrap lost the explicit Astra opt-in.'
     Write-Output ('WINDOWS VERIFY PASSED: PowerShell ' + $PSVersionTable.PSVersion)
 } finally {
     foreach ($key in $previous.Keys) { [Environment]::SetEnvironmentVariable($key, $previous[$key], 'Process') }
