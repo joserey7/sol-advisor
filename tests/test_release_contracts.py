@@ -19,7 +19,7 @@ class ReleaseContracts(unittest.TestCase):
         manifest = json.loads((PLUGIN / ".codex-plugin/plugin.json").read_text())
         self.assertEqual("0.8.0", manifest["version"])
         self.assertEqual(manifest["version"], core.REGISTRY["release_version"])
-        self.assertIn("0.8.0 - Unreleased", (ROOT / "CHANGELOG.md").read_text())
+        self.assertIn("0.8.0 - 2026-09-22", (ROOT / "CHANGELOG.md").read_text())
         self.assertEqual("Daniel McAteer", manifest["author"]["name"])
         self.assertEqual("https://github.com/joserey7/sol-advisor", manifest["repository"])
 

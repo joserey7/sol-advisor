@@ -6,7 +6,7 @@ risk warrants it. Astra advises only on explicitly authorized exceptional decisi
 A Codex-native workflow with four selective routes, not an always-on agent pipeline.
 The primary keeps intent, architecture, verification, and acceptance. Start with `solo`;
 delegate only when it replaces meaningful work or context. GPT-6 Sol replaces the Terra
-implementation lane. The next release is **v0.8.0 (unreleased)**; v0.7.0 remains the
+implementation lane. **v0.8.0** is the GPT-6 release; v0.7.0 remains the
 published GPT-5.6 checkpoint. See [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start

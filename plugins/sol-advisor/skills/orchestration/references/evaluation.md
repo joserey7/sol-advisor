@@ -2,7 +2,7 @@
 
 ## Scope and source checks
 
-v0.8.0 is an unreleased candidate until the release checklist is completed. Initial
+v0.8.0 was published on 2026-09-22 after the release checklist. Its initial
 pins are Sol xhigh (primary, demanding implementation, review), Luna max (bounded
 implementation), and optional Astra high (decision advice). These settings preserve
 the previous reasoning policy where practical; they are not a measured optimum.
@@ -15,6 +15,32 @@ Official references checked on 2026-09-22:
 
 Public documentation does not establish account access or observed runtime configuration.
 No benchmark here proves Luna equals old Terra or that a lower effort costs less overall.
+
+## v0.8.0 release verification
+
+On 2026-09-22, the portable suite passed 54 tests locally (five Windows skips for
+unavailable symlink privileges or the POSIX-only wrapper). The PR's POSIX verifier
+and four Windows CI combinations of PowerShell 5.1/7 and Python 3.11/3.13 passed.
+`git diff --check` was clean.
+
+A native Windows smoke run covered a clean core install, exact released v0.7.0
+upgrade, Terra archival, preservation of customized Terra, refusal of a conflicting
+Luna profile before writes, and optional Astra installation in a disposable target.
+The normal installation left Astra absent.
+
+A disposable native Codex task observed Sol/xhigh as primary and exercised `solo`,
+Luna/max `delegate`, Sol/xhigh `delegate`, `audit`, and `full`. Selected-role checks
+and declared-plan validation passed. Fresh Sol/xhigh reviews in `full` returned
+`fix-first` for fixture defects; after Luna corrections and primary verification,
+a new review returned `ship` for the fixture's explicit bounded contract. All
+reviewers received fresh context. Astra was not consulted.
+
+The reviewers requested read-only access, but this Windows host applied
+`workspace-write` / `managed`. Before/after manifests of tracked and untracked
+files were identical during each review, so behavioral read-only was observed;
+enforced read-only isolation was not. Check the effective host policy on each run
+and require hard isolation when the task needs it. Cost and quality comparisons
+for later routing changes remain unmeasured.
 
 ## Release checklist
 

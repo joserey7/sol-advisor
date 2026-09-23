@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.8.0 - Unreleased
+## 0.8.0 - 2026-09-22
 
 - Move primary, demanding implementation, and fresh review to GPT-6 Sol / xhigh;
   move bounded implementation to GPT-6 Luna / max. Retire Terra as an active lane.
