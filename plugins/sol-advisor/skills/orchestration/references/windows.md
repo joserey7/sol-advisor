@@ -10,9 +10,15 @@ From a reviewed clone of `joserey7/sol-advisor`:
 
 ~~~powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install-plugin.ps1
-# Later, update the installed marketplace and core profiles:
+# Later, refresh the installed plugin and core profiles:
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install-plugin.ps1 -Update
 ~~~
+
+For a marketplace registered from a local clone, update that clone first. `-Update`
+refreshes the installed plugin from the registered local path. For a Git-backed
+marketplace, it upgrades the marketplace before refreshing the plugin. Run the
+bootstrap from a checkout containing this fix, even if the registered local path is
+another clone.
 
 This process-only execution-policy option does not override managed organization policy.
 The bootstrap finds the exact installed plugin and installs its cached profiles, not

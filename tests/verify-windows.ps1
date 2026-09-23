@@ -9,7 +9,7 @@ if (-not (Test-Path -LiteralPath $engine)) { $engine = Join-Path $PSHOME 'pwsh.e
 $temp = Join-Path ([IO.Path]::GetTempPath()) ('sol advisor [test] ' + [guid]::NewGuid())
 [IO.Directory]::CreateDirectory($temp) | Out-Null
 $previous = @{}
-foreach ($key in @('CODEX_HOME', 'FAKE_BUNDLE', 'FAKE_LOG', 'FAKE_MODE', 'FAKE_PYTHON')) {
+foreach ($key in @('CODEX_HOME', 'FAKE_BUNDLE', 'FAKE_LOG', 'FAKE_MODE', 'FAKE_PYTHON', 'FAKE_MARKETPLACE_KIND', 'FAKE_MARKETPLACE_ROOT')) {
     $previous[$key] = [Environment]::GetEnvironmentVariable($key, 'Process')
 }
 function Assert-True($Condition, [string] $Message) {
@@ -80,9 +80,23 @@ args = sys.argv[1:]
 with open(os.environ['FAKE_LOG'], 'a', encoding='utf-8') as stream:
     stream.write(json.dumps(args) + '\n')
 mode = os.environ.get('FAKE_MODE', '')
+kind = os.environ.get('FAKE_MARKETPLACE_KIND', 'local')
 if mode == 'fail-register' and args[:3] == ['plugin', 'marketplace', 'add']:
     sys.exit(17)
 if mode == 'fail-install' and args[:2] == ['plugin', 'add']:
+    sys.exit(17)
+if args == ['plugin', 'marketplace', 'list', '--json']:
+    if mode == 'bad-marketplace-json':
+        print('invalid JSON')
+        sys.exit(0)
+    entry = {'name': 'sol-advisor-joserey7', 'root': os.environ['FAKE_MARKETPLACE_ROOT']}
+    if kind == 'git':
+        entry['marketplaceSource'] = {'sourceType': 'git', 'source': 'https://github.com/joserey7/sol-advisor.git'}
+    print(json.dumps({'marketplaces': [] if mode == 'missing-marketplace' else [entry]}))
+if args[:3] == ['plugin', 'marketplace', 'upgrade'] and kind == 'local':
+    print("Error: marketplace 'sol-advisor-joserey7' is not configured as a Git marketplace", file=sys.stderr)
+    sys.exit(17)
+if mode == 'fail-upgrade' and args[:3] == ['plugin', 'marketplace', 'upgrade']:
     sys.exit(17)
 if args == ['plugin', 'list', '--json']:
     if mode == 'bad-json':
@@ -105,18 +119,35 @@ if args == ['plugin', 'list', '--json']:
     $env:FAKE_MODE = 'ok'
     $env:CODEX_HOME = Join-Path $temp 'bootstrap success'
     $sourcePath = Join-Path $temp 'marketplace with spaces [literal]'
+    [IO.Directory]::CreateDirectory($sourcePath) | Out-Null
+    $env:FAKE_MARKETPLACE_ROOT = $sourcePath
+    $env:FAKE_MARKETPLACE_KIND = 'local'
     $null = Run-Script $bootstrap @('-CodexCommand', $fakeCmd, '-Source', $sourcePath) $true
     $installedLuna = Join-Path $env:CODEX_HOME 'agents/sol-advisor-luna-implementer.toml'
     Assert-True ((Get-FileHash -LiteralPath $cachedLuna).Hash -ceq (Get-FileHash -LiteralPath $installedLuna).Hash) 'Bootstrap did not use the installed cache templates.'
     $calls = @(Get-Content -LiteralPath $env:FAKE_LOG | ForEach-Object { ,(ConvertFrom-Json $_) })
     Assert-True (@($calls | Where-Object { $_.Count -eq 4 -and $_[0] -eq 'plugin' -and $_[2] -eq 'add' -and $_[3] -ceq $sourcePath }).Count -eq 1) 'Source path argument was corrupted.'
     $null = Run-Script $bootstrap @('-CodexCommand', $fakeCmd, '-Update') $true
+    $calls = @(Get-Content -LiteralPath $env:FAKE_LOG | ForEach-Object { ,(ConvertFrom-Json $_) })
+    Assert-True (@($calls | Where-Object { $_[0] -eq 'plugin' -and $_[1] -eq 'marketplace' -and $_[2] -eq 'upgrade' }).Count -eq 0) 'Local marketplace update invoked Git-only upgrade.'
     $installedAstra = Join-Path $env:CODEX_HOME 'agents/sol-advisor-astra-advisor.toml'
     Assert-True (-not (Test-Path -LiteralPath $installedAstra)) 'Bootstrap installed Astra without opt-in.'
     $null = Run-Script $bootstrap @('-CodexCommand', $fakeCmd, '-Update', '-WithAstra') $true
     Assert-True (Test-Path -LiteralPath $installedAstra -PathType Leaf) 'Bootstrap lost the explicit Astra opt-in.'
+    $env:FAKE_MARKETPLACE_KIND = 'git'
+    $null = Run-Script $bootstrap @('-CodexCommand', $fakeCmd, '-Update') $true
+    $calls = @(Get-Content -LiteralPath $env:FAKE_LOG | ForEach-Object { ,(ConvertFrom-Json $_) })
+    Assert-True (@($calls | Where-Object { $_[0] -eq 'plugin' -and $_[1] -eq 'marketplace' -and $_[2] -eq 'upgrade' }).Count -eq 1) 'Git marketplace update did not upgrade the marketplace.'
+    foreach ($mode in @('bad-marketplace-json', 'missing-marketplace', 'fail-upgrade')) {
+        $env:FAKE_MODE = $mode
+        $env:CODEX_HOME = Join-Path $temp ('update ' + $mode)
+        $null = Run-Script $bootstrap @('-CodexCommand', $fakeCmd, '-Update') $false
+        Assert-True (-not (Test-Path -LiteralPath (Join-Path $env:CODEX_HOME 'agents'))) ('Failed update installed agents: ' + $mode)
+    }
     Write-Output ('WINDOWS VERIFY PASSED: PowerShell ' + $PSVersionTable.PSVersion)
 } finally {
     foreach ($key in $previous.Keys) { [Environment]::SetEnvironmentVariable($key, $previous[$key], 'Process') }
     if (Test-Path -LiteralPath $temp) { Remove-Item -LiteralPath $temp -Recurse -Force }
 }
+# Expected-failure child cases can leave LASTEXITCODE set even after every assertion passes.
+exit 0
