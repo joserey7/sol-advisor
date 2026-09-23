@@ -149,3 +149,5 @@ if args == ['plugin', 'list', '--json']:
     foreach ($key in $previous.Keys) { [Environment]::SetEnvironmentVariable($key, $previous[$key], 'Process') }
     if (Test-Path -LiteralPath $temp) { Remove-Item -LiteralPath $temp -Recurse -Force }
 }
+# Expected-failure child cases can leave LASTEXITCODE set even after every assertion passes.
+exit 0
