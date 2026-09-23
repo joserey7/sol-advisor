@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "release_version": "0.8.0",
+  "release_version": "0.8.1",
   "primary": {
     "model": "gpt-6-sol",
     "effort": "xhigh"
