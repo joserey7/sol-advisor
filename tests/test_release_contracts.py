@@ -17,18 +17,18 @@ REFS = PLUGIN / "skills/orchestration/references"
 class ReleaseContracts(unittest.TestCase):
     def test_version_manifest_registry_and_changelog_agree(self):
         manifest = json.loads((PLUGIN / ".codex-plugin/plugin.json").read_text())
-        self.assertEqual("0.8.1", manifest["version"])
+        self.assertEqual("0.9.0", manifest["version"])
         self.assertEqual(manifest["version"], core.REGISTRY["release_version"])
-        self.assertIn("0.8.1 - Unreleased", (ROOT / "CHANGELOG.md").read_text())
+        self.assertIn("0.9.0 - 2026-09-29", (ROOT / "CHANGELOG.md").read_text())
         self.assertEqual("Daniel McAteer", manifest["author"]["name"])
         self.assertEqual("https://github.com/joserey7/sol-advisor", manifest["repository"])
 
     def test_exact_active_inventory_and_independent_roles(self):
         self.assertEqual(set(core.FILES.values()), {p.name for p in TEMPLATES.glob("*.toml")})
         self.assertEqual({"luna", "sol-implementer", "sol"}, set(core.CORE_ROLES))
-        self.assertEqual({"model": "gpt-6-sol", "effort": "xhigh"}, core.REGISTRY["primary"])
-        expected = {"luna": ("gpt-6-luna", "max"), "sol-implementer": ("gpt-6-sol", "xhigh"),
-                    "sol": ("gpt-6-sol", "xhigh"), "astra": ("gpt-6-astra", "high")}
+        self.assertEqual({"model": "gpt-6.1-sol", "effort": "xhigh"}, core.REGISTRY["primary"])
+        expected = {"luna": ("gpt-6-luna", "max"), "sol-implementer": ("gpt-6.1-sol", "xhigh"),
+                    "sol": ("gpt-6.1-sol", "xhigh"), "astra": ("gpt-6-astra", "high")}
         for key, (model, effort) in expected.items():
             data = tomllib.loads((TEMPLATES / core.FILES[key]).read_text())
             self.assertEqual(model, data["model"])
@@ -42,7 +42,7 @@ class ReleaseContracts(unittest.TestCase):
         self.assertFalse((TEMPLATES / core.TERRA_FILE).exists())
 
     def test_registered_fingerprints_exactly_match_immutable_fixture_bytes(self):
-        expected = {"luna": set(), "terra": set(), "sol": set()}
+        expected = {key: set() for key in (*core.CORE_ROLES, "terra")}
         for fixture in FIXTURES.values():
             digest = hashlib.sha256(fixture["content"].encode()).hexdigest()
             self.assertEqual(fixture["sha256"], digest)
@@ -53,6 +53,10 @@ class ReleaseContracts(unittest.TestCase):
                           ("terra", "347c2fdaf35d12341b160a1036af40d67728b567"),
                           ("sol", "603887c943297b0c5cbe6ce4f92f43dc9848003f")]:
             data = FIXTURES["v070_" + role]["content"].encode()
+            self.assertEqual(sha, hashlib.sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest())
+        for role, sha in [("sol-implementer", "7c582c22768a20de7e643cb8c54c310945369ca7"),
+                          ("sol", "4b712422edcbbcf2d6c74c742869f6f815f2e6a5")]:
+            data = FIXTURES["v080_" + role]["content"].encode()
             self.assertEqual(sha, hashlib.sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest())
         self.assertEqual("000ff8bed7f94f77a460fb81424d51233eb6146db5b21a346068aceb6a9abe27", FIXTURES["v060_luna_crlf"]["sha256"])
         self.assertEqual("7c9497c46207007565f72ac9bac6ce4954a1491914e4d64b44e27e4c27e8cd43", FIXTURES["v060_terra_crlf"]["sha256"])

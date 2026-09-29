@@ -1,19 +1,19 @@
 # Sol Advisor
 
-**GPT-6 Sol owns delivery. Luna implements bounded work. A fresh Sol reviews when
+**GPT-6.1 Sol owns delivery. Luna implements bounded work. A fresh Sol reviews when
 risk warrants it. Astra advises only on explicitly authorized exceptional decisions.**
 
 A Codex-native workflow with four selective routes, not an always-on agent pipeline.
 The primary keeps intent, architecture, verification, and acceptance. Start with `solo`;
-delegate only when it replaces meaningful work or context. GPT-6 Sol replaces the Terra
-implementation lane. **v0.8.0** is the GPT-6 release; v0.7.0 remains the
-published GPT-5.6 checkpoint. See [CHANGELOG.md](CHANGELOG.md).
+delegate only when it replaces meaningful work or context. GPT-6.1 Sol handles demanding
+implementation and fresh review. **v0.9.0** upgrades Sol and includes the Windows local
+marketplace update fix from PR #5. See [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start
 
 Use a current Codex CLI with plugins and native custom agents, and the same Codex home
 as the desktop app. **Python 3.11+ is required on Windows, macOS, and Linux.** Both
-platform wrappers now use one standard-library implementation. Select **GPT-6 Sol /
+platform wrappers now use one standard-library implementation. Select **GPT-6.1 Sol /
 xhigh** in the primary session. Only selected auxiliaries need model access.
 
 ### Windows: native PowerShell
@@ -93,8 +93,9 @@ codex plugin marketplace upgrade sol-advisor-joserey7
 codex plugin add sol-advisor@sol-advisor-joserey7
 ~~~
 
-Recognized released Luna/Sol profiles migrate safely, including historical Windows CRLF
-variants. Exact Terra profiles are archived outside the agents directory. Customized
+Recognized released Luna/Sol profiles migrate safely, including v0.8.0/v0.8.1 Sol
+implementer/reviewer profiles and historical Windows CRLF variants. Exact Terra
+profiles are archived outside the agents directory. Customized
 Terra files are preserved with a warning; review and move them outside discovery manually.
 Modified or unsafe selected active profiles are never overwritten. No Codex configuration
 is edited. Missing Astra does not block ordinary routes. Read the
@@ -119,6 +120,6 @@ No performance or savings claims are implied by passing static tests.
 
 Fork of [Daniel McAteer's Sol Advisor](https://github.com/DannyMac180/sol-advisor),
 retaining the upstream architect-owned, evidence-based delivery approach. This fork adds
-native Windows support and GPT-6 selective delivery with optional authorized Astra advice.
+native Windows support and GPT-6.1 Sol selective delivery with optional authorized Astra advice.
 Daniel writes [Attention Heads](https://attentionheads.substack.com/) and the
 Agentic Engineering Field Notes series. MIT license; original attribution is retained.

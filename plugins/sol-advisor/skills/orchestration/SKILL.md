@@ -1,12 +1,12 @@
 ---
 name: orchestration
-description: "Codex-native selective delivery with GPT-6 Sol and Luna; explicitly authorized Astra decision advice is optional."
+description: "Codex-native selective delivery with GPT-6.1 Sol and GPT-6 Luna; explicitly authorized Astra decision advice is optional."
 ---
 
 # Sol Advisor Orchestration
 
 Own intent, architecture, route selection, verification, and acceptance in the primary
-GPT-6 Sol / xhigh session. Default to `solo`; normally use at most one auxiliary.
+GPT-6.1 Sol / xhigh session. Default to `solo`; normally use at most one auxiliary.
 Keep the four delivery modes `solo`, `delegate`, `audit`, and exceptional `full`.
 Astra is an optional decision consultation, not a fifth mode or a routine pipeline step.
 
@@ -34,7 +34,7 @@ required review. A material-risk review can be removed only with explicit user a
 and evidence that the risk was eliminated, not merely to save credits.
 
 Verify primary model and effort through available runtime metadata. The required pin
-is `gpt-6-sol` / `xhigh`. If unavailable, ask for user confirmation; if conflicting,
+is `gpt-6.1-sol` / `xhigh`. If unavailable, ask for user confirmation; if conflicting,
 request the correct session and stop before implementation or delegation. A skill
 cannot change the primary model. Never pretend metadata or access was observed.
 

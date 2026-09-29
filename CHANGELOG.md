@@ -1,10 +1,16 @@
 # Changelog
 
-## 0.8.1 - Unreleased
+## 0.9.0 - 2026-09-29
 
+- Move primary delivery, demanding implementation, and fresh review to GPT-6.1 Sol /
+  xhigh. Keep GPT-6 Luna / max for bounded work and optional GPT-6 Astra / high advice.
+- Migrate byte-exact v0.8.0/v0.8.1 Sol implementer and reviewer profiles automatically;
+  customized profiles still fail preflight without being overwritten. Retain all
+  older migration fingerprints and the existing four-route policy.
 - Fix the Windows `install-plugin.ps1 -Update` path for marketplaces registered
   from a local clone. It refreshes the plugin from the registered local root;
-  Git-backed marketplaces still run `marketplace upgrade` first.
+  Git-backed marketplaces still run `marketplace upgrade` first. Includes merged PR #5;
+  the previously unreleased v0.8.1 fix ships in this release.
 
 ## 0.8.0 - 2026-09-22
 

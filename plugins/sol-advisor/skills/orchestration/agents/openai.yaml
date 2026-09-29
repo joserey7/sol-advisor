@@ -1,4 +1,4 @@
 interface:
   display_name: "Sol Advisor Orchestration"
-  short_description: "Selective GPT-6 Sol/Luna delivery; Astra advice only with explicit authorization"
-  default_prompt: "Use $orchestration to declare a SELECTIVE ROUTE, inspect before confirming it, and build and verify with GPT-6 Sol/Luna. Do not use Astra without explicit user authorization."
+  short_description: "GPT-6.1 Sol leads; Luna implements; Astra by authorization"
+  default_prompt: "Use $orchestration to declare a SELECTIVE ROUTE, inspect before confirming it, and build and verify with GPT-6.1 Sol and GPT-6 Luna. Do not use Astra without explicit user authorization."
