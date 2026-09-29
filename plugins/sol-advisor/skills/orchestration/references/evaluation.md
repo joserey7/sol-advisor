@@ -8,7 +8,7 @@ and selected-role inspection remains strict. Regression fixtures cover missing r
 wrong pins, ambiguous metadata, privacy, and native PowerShell forwarding. This patch
 does not change model pins, routing, isolation policy, or cost/quality claims.
 
-Local patch verification on 2026-09-29: 61 Python tests passed with five
+Local patch verification on 2026-09-29: 62 Python tests ran successfully, with five
 platform/privilege skips on Windows. Native entry points and mock bootstrap passed
 on Windows PowerShell 5.1 and PowerShell 7.6.5. These fixtures verify behavior,
 not fresh-session role discovery; restart Codex after migrating installed profiles.

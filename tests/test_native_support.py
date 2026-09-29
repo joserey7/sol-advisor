@@ -427,6 +427,19 @@ class NativeSupportTests(unittest.TestCase):
             self.assertNotEqual(0, result.returncode)
             self.assertEqual("", result.stdout)
 
+    def test_primary_cli_rejects_malformed_identity_without_leaking_values(self):
+        for field in ("agent_role", "parent_thread_id"):
+            for value in ({"identity": SECRET}, [SECRET], 123, False, ""):
+                rows = self.records()
+                rows[0]["payload"] = {"id": THREAD, field: value}
+                rows[-1]["payload"].update(model="gpt-6.1-sol", effort="xhigh")
+                self.rollout(rows)
+                result = self.cli("inspect", "--sessions-dir", str(self.sessions), "--expect-primary", THREAD)
+                with self.subTest(field=field, value=value):
+                    self.assertNotEqual(0, result.returncode)
+                    self.assertEqual("", result.stdout)
+                    self.assertNotIn(SECRET, result.stderr)
+
     def test_primary_cli_cannot_be_combined_with_auxiliary_or_isolation_checks(self):
         for flags in [("--expect-role", "sol"), ("--require-read-only",)]:
             result = self.cli("inspect", "--sessions-dir", str(self.sessions),

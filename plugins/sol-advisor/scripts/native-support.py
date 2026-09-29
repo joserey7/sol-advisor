@@ -366,6 +366,9 @@ def inspect_runtime(sessions: Path, thread_id: str, *, require_agent_role=True) 
                 if kind == "session_meta":
                     if session is not None:
                         raise SupportError("Ambiguous session metadata.")
+                    for key in ("parent_thread_id", "agent_role"):
+                        if payload.get(key) is not None and not isinstance(payload[key], str):
+                            raise SupportError("Invalid session identity metadata.")
                     session = {key: string_or_null(payload.get(key)) for key in (
                         "id", "parent_thread_id", "agent_role", "agent_path", "model_provider"
                     )}
@@ -394,7 +397,7 @@ def inspect_runtime(sessions: Path, thread_id: str, *, require_agent_role=True) 
 
 
 def verify_primary_runtime(data: dict) -> None:
-    if data.get("parent_thread_id") or data.get("agent_role") not in (None, "default"):
+    if data.get("parent_thread_id") is not None or data.get("agent_role") not in (None, "default"):
         raise SupportError("Expected a primary session; auxiliary identity was observed.")
     primary = REGISTRY["primary"]
     if (data.get("model"), data.get("effort")) != (primary["model"], primary["effort"]):
