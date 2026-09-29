@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "release_version": "0.8.1",
+  "release_version": "0.9.0",
   "primary": {
-    "model": "gpt-6-sol",
+    "model": "gpt-6.1-sol",
     "effort": "xhigh"
   },
   "roles": {
@@ -17,7 +17,7 @@
     "sol-implementer": {
       "file": "sol-advisor-sol-implementer.toml",
       "name": "sol_advisor_sol_implementer",
-      "model": "gpt-6-sol",
+      "model": "gpt-6.1-sol",
       "effort": "xhigh",
       "optional": false,
       "read_only": false
@@ -25,7 +25,7 @@
     "sol": {
       "file": "sol-advisor-sol-reviewer.toml",
       "name": "sol_advisor_sol_reviewer",
-      "model": "gpt-6-sol",
+      "model": "gpt-6.1-sol",
       "effort": "xhigh",
       "optional": false,
       "read_only": true
@@ -54,10 +54,14 @@
       "7c9497c46207007565f72ac9bac6ce4954a1491914e4d64b44e27e4c27e8cd43",
       "3ada9926059480faf42a71acaa5095a36c831cd5a15d2954f7a8f5b0bf16453b"
     ],
+    "sol-implementer": [
+      "7b64ef186fd8692b8609bda18a8fe07c9db1bfb5dc7ba62d29a72bc80ea73024"
+    ],
     "sol": [
       "0333acf0ef562bcfebd06009ac09bd1dd8cbc04c4cf28e08e9e049bd8bf202d2",
       "6ac63677bcc8677a9a743522cf06696c8edb1b005a61430e0fc8fa62e18dc355",
-      "14a55bcb97eeaa5cf5d6bef754fe868480da163084aa0b63c9600dccd966813e"
+      "14a55bcb97eeaa5cf5d6bef754fe868480da163084aa0b63c9600dccd966813e",
+      "7de8eac562074671aad7c1206e4451cf6bca1b11d759d760d1f92a2ac1972b5c"
     ]
   }
 }

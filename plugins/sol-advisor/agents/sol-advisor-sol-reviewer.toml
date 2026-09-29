@@ -1,6 +1,6 @@
 name = "sol_advisor_sol_reviewer"
-description = "Fresh read-only GPT-6 Sol review for audit/full; never an implementation worker."
-model = "gpt-6-sol"
+description = "Fresh read-only GPT-6.1 Sol review for audit/full; never an implementation worker."
+model = "gpt-6.1-sol"
 model_reasoning_effort = "xhigh"
 sandbox_mode = "read-only"
 

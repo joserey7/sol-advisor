@@ -40,8 +40,9 @@ Availability in the host must still be verified at runtime.
 IDs, effort, optional status, and read-only requests must match shipped TOMLs.
 
 Only byte-exact recognized historical Luna/Sol files are migrated. v0.2.0/v0.5.0/v0.6.0
-fingerprints and the released v0.6.0 CRLF variants are retained; v0.7.0 LF profiles are
-added. Modified or unsafe active selected files fail before any installation changes.
+fingerprints and the released v0.6.0 CRLF variants are retained; v0.7.0 LF profiles and
+v0.8.0/v0.8.1 Sol implementer/reviewer LF profiles are recognized. Modified or unsafe
+active selected files fail before any installation changes.
 New/current CRLF files are not silently normalized. Keep historical fixture bytes intact.
 
 Known exact Terra profiles are archived as

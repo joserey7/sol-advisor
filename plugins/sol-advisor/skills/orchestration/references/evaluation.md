@@ -1,6 +1,33 @@
-# GPT-6 release validation and measurement
+# Release validation and measurement
 
-## Scope and source checks
+## v0.9.0 scope and sources
+
+v0.9.0 selects GPT-6.1 Sol / xhigh for primary delivery, demanding implementation,
+and fresh review. GPT-6 Luna / max and optional GPT-6 Astra / high retain their roles.
+The four routes and authorization policy remain the same. The release includes the
+merged PR #5 Windows local marketplace update fix, initially prepared as v0.8.1.
+
+The [official Codex models documentation](https://learn.chatgpt.com/docs/models)
+was checked on 2026-09-29 and specifies `gpt-6.1-sol`. Account/client availability
+must still be observed; preserving xhigh is a policy choice, not a measured optimum.
+Byte-exact released v0.8.0/v0.8.1 Sol profiles are recognized for migration, alongside
+all older fixtures. Modified profiles remain conflicts.
+
+## v0.9.0 verification and limits
+
+On 2026-09-29, the local portable suite ran 56 tests successfully with five Windows
+skips (symlink privileges and the POSIX wrapper). Native bootstrap fixtures passed
+under PowerShell 5.1 and 7.6. They cover local and Git-backed marketplace updates,
+failure paths, cache-based installation, and optional Astra installation. Exact
+v0.8.0 Sol migration, preservation of customized profiles, and rejection of the old
+model in runtime-role checks are covered by portable regressions.
+
+The complete live four-route exercise recorded below belongs to v0.8.0; it is not a
+GPT-6.1 result. Routing was not redesigned in v0.9.0. Live installed-role discovery,
+effective sandbox isolation, and cost/quality comparisons must be checked on each
+target host. Static checks do not establish those properties or universal model access.
+
+## v0.8.0 scope and source checks
 
 v0.8.0 was published on 2026-09-22 after the release checklist. Its initial
 pins are Sol xhigh (primary, demanding implementation, review), Luna max (bounded

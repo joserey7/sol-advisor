@@ -1,14 +1,14 @@
 # Native role contracts
 
 The source of pin metadata is `scripts/role-registry.json`; shipped TOMLs must match.
-The primary is GPT-6 Sol / xhigh. All auxiliary spawns use fresh context and no per-spawn
+The primary is GPT-6.1 Sol / xhigh. All auxiliary spawns use fresh context and no per-spawn
 model or effort overrides. Use `fork_turns: none` with the exact `agent_type` below.
 
 | Companion check key | Native agent type | Model / effort | Responsibility |
 |---|---|---|---|
 | `luna` | `sol_advisor_luna_implementer` | gpt-6-luna / max | Bounded implementation |
-| `sol-implementer` | `sol_advisor_sol_implementer` | gpt-6-sol / xhigh | Judgment-heavy implementation |
-| `sol` | `sol_advisor_sol_reviewer` | gpt-6-sol / xhigh | Fresh audit/full review |
+| `sol-implementer` | `sol_advisor_sol_implementer` | gpt-6.1-sol / xhigh | Judgment-heavy implementation |
+| `sol` | `sol_advisor_sol_reviewer` | gpt-6.1-sol / xhigh | Fresh audit/full review |
 | `astra` | `sol_advisor_astra_advisor` | gpt-6-astra / high | Optional authorized decision advice |
 
 The `sol` check alias remains the reviewer for compatibility. It never means the Sol

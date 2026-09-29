@@ -12,6 +12,7 @@ import stat
 import subprocess
 import sys
 import tempfile
+import tomllib
 import unittest
 from types import SimpleNamespace
 from unittest import mock
@@ -286,6 +287,22 @@ class NativeSupportTests(unittest.TestCase):
                 self.assertEqual(before, self.snapshot())
                 path.unlink()
 
+    def test_full_v080_installation_migrates_sol_roles_without_astra(self):
+        self.target.mkdir(parents=True)
+        luna = self.target / core.FILES["luna"]
+        luna.write_bytes((TEMPLATES / core.FILES["luna"]).read_bytes())
+        luna_before = (luna.read_bytes(), luna.stat().st_mtime_ns)
+        for role in ("sol-implementer", "sol"):
+            self.write_fixture("v080_" + role)
+        self.install()
+        self.install(check=True)
+        for role in ("sol-implementer", "sol"):
+            parsed = tomllib.loads((self.target / core.FILES[role]).read_text())
+            self.assertEqual("gpt-6.1-sol", parsed["model"])
+            self.assertEqual("xhigh", parsed["model_reasoning_effort"])
+        self.assertEqual(luna_before, (luna.read_bytes(), luna.stat().st_mtime_ns))
+        self.assertFalse((self.target / core.FILES["astra"]).exists())
+
     def test_custom_terra_is_preserved_and_warned_not_selected(self):
         path, data = self.write_fixture("v070_terra")
         path.write_bytes(data + b"# customization\n")
@@ -412,15 +429,21 @@ class NativeSupportTests(unittest.TestCase):
                 bad = dict(data, **{field: "wrong"})
                 with self.assertRaises(core.SupportError):
                     core.verify_runtime(bad, key)
-        data = {"agent_role": core.PINS["sol-implementer"][0], "model": "gpt-6-sol", "effort": "xhigh"}
+        data = {"agent_role": core.PINS["sol-implementer"][0], "model": "gpt-6.1-sol", "effort": "xhigh"}
         with self.assertRaises(core.SupportError):
             core.verify_runtime(data, "sol")
 
     def test_required_isolation_rejects_broader_or_unobservable_policy(self):
         for observed in (None, "workspace-write", "danger-full-access"):
-            data = {"agent_role": core.PINS["sol"][0], "model": "gpt-6-sol", "effort": "xhigh", "sandbox_policy_type": observed}
+            data = {"agent_role": core.PINS["sol"][0], "model": "gpt-6.1-sol", "effort": "xhigh", "sandbox_policy_type": observed}
             with self.assertRaises(core.SupportError):
                 core.verify_runtime(data, "sol", require_read_only=True)
+
+    def test_previous_sol_model_fails_runtime_pins_for_both_roles(self):
+        for role in ("sol-implementer", "sol"):
+            data = {"agent_role": core.PINS[role][0], "model": "gpt-6-sol", "effort": "xhigh"}
+            with self.subTest(role=role), self.assertRaises(core.SupportError):
+                core.verify_runtime(data, role)
 
     @unittest.skipIf(os.name == "nt", "POSIX wrapper; Windows has separate PS fixtures")
     def test_posix_wrapper_install_check_runtime_and_relative_paths(self):

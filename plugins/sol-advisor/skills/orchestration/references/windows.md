@@ -23,7 +23,7 @@ another clone.
 This process-only execution-policy option does not override managed organization policy.
 The bootstrap finds the exact installed plugin and installs its cached profiles, not
 potentially different templates from the working checkout. It never edits Codex model,
-sandbox, or default-agent settings. Restart the app and start a NEW task on GPT-6 Sol /
+sandbox, or default-agent settings. Restart the app and start a NEW task on GPT-6.1 Sol /
 xhigh. Check selected auxiliary access at runtime; installed files are not proof of access.
 
 The default bundle installs Luna implementation, Sol implementation, and Sol review.
@@ -78,7 +78,8 @@ and the actual-isolation rules in [operations.md](operations.md).
 
 ## Migration and troubleshooting
 
-Exact recognized v0.7.0 Luna/Sol files migrate to GPT-6. Older immutable fingerprints,
+Exact recognized v0.7.0 Luna/Sol and v0.8.0/v0.8.1 Sol files migrate to the current pins.
+Sol implementation and review use GPT-6.1 Sol / xhigh. Older immutable fingerprints,
 including v0.6.0 CRLF Windows variants, remain supported. Exact Terra files are archived
 under the sibling `sol-advisor-retired` directory; customized files remain untouched
 with a warning. Review and move retained Terra files outside the agents directory;

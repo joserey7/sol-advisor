@@ -91,7 +91,7 @@ try {
     if ($WithAstra) { $installArguments += '--with-astra' }
     & $python.Executable @prefix $helper @installArguments
     if ($LASTEXITCODE -ne 0) { throw 'Plugin is registered, but companion installation failed. Resolve the reported conflict; do not overwrite customized files blindly.' }
-    Write-Output 'PLUGIN INSTALL PASSED. Restart Codex Desktop and start a NEW task; select GPT-6 Sol / xhigh in the primary session.'
+    Write-Output 'PLUGIN INSTALL PASSED. Restart Codex Desktop and start a NEW task; select GPT-6.1 Sol / xhigh in the primary session.'
     exit 0
 } catch {
     [Console]::Error.WriteLine('ERROR: ' + $_.Exception.Message)
