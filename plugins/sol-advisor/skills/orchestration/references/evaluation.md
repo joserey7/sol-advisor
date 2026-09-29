@@ -1,5 +1,18 @@
 # Release validation and measurement
 
+## v0.9.1 scope
+
+The primary inspector now validates the primary model/effort without treating absent
+auxiliary role identity as an error. Auxiliary sessions cannot satisfy primary checks,
+and selected-role inspection remains strict. Regression fixtures cover missing role,
+wrong pins, ambiguous metadata, privacy, and native PowerShell forwarding. This patch
+does not change model pins, routing, isolation policy, or cost/quality claims.
+
+Local patch verification on 2026-09-29: 62 Python tests ran successfully, with five
+platform/privilege skips on Windows. Native entry points and mock bootstrap passed
+on Windows PowerShell 5.1 and PowerShell 7.6.5. These fixtures verify behavior,
+not fresh-session role discovery; restart Codex after migrating installed profiles.
+
 ## v0.9.0 scope and sources
 
 v0.9.0 selects GPT-6.1 Sol / xhigh for primary delivery, demanding implementation,
@@ -10,8 +23,8 @@ merged PR #5 Windows local marketplace update fix, initially prepared as v0.8.1.
 The [official Codex models documentation](https://learn.chatgpt.com/docs/models)
 was checked on 2026-09-29 and specifies `gpt-6.1-sol`. Account/client availability
 must still be observed; preserving xhigh is a policy choice, not a measured optimum.
-Byte-exact released v0.8.0/v0.8.1 Sol profiles are recognized for migration, alongside
-all older fixtures. Modified profiles remain conflicts.
+Byte-exact released v0.8.0 Sol profiles (also used by the v0.8.1 candidate) are
+recognized for migration, alongside all older fixtures. Modified profiles remain conflicts.
 
 ## v0.9.0 verification and limits
 

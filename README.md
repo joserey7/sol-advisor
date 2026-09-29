@@ -6,8 +6,8 @@ risk warrants it. Astra advises only on explicitly authorized exceptional decisi
 A Codex-native workflow with four selective routes, not an always-on agent pipeline.
 The primary keeps intent, architecture, verification, and acceptance. Start with `solo`;
 delegate only when it replaces meaningful work or context. GPT-6.1 Sol handles demanding
-implementation and fresh review. **v0.9.0** upgrades Sol and includes the Windows local
-marketplace update fix from PR #5. See [CHANGELOG.md](CHANGELOG.md).
+implementation and fresh review. **v0.9.1** adds primary-session verification to the
+GPT-6.1 upgrade and Windows local marketplace update fix. See [CHANGELOG.md](CHANGELOG.md).
 
 ## Quick start
 
@@ -83,6 +83,10 @@ plan validation, **not a hard token/credit limit**. See the
 ## Updating and migration
 
 Windows: rerun the bootstrap with `-Update`; add `-WithAstra` only for an opted-in profile.
+Updating the plugin skill through Codex alone does not update the companion files in
+`CODEX_HOME/agents`. Rerun the bootstrap or companion installer; a `legacy` preflight
+means a recognized older profile still needs migration. Restart Codex and start a
+fresh task after updating so the new native roles are discovered.
 For a marketplace registered from a local clone, update that clone first: `-Update`
 refreshes from its registered path. Git-backed marketplaces are upgraded automatically.
 POSIX: upgrade the marketplace, add the plugin again, resolve its installed path, and
@@ -93,8 +97,9 @@ codex plugin marketplace upgrade sol-advisor-joserey7
 codex plugin add sol-advisor@sol-advisor-joserey7
 ~~~
 
-Recognized released Luna/Sol profiles migrate safely, including v0.8.0/v0.8.1 Sol
-implementer/reviewer profiles and historical Windows CRLF variants. Exact Terra
+Recognized released Luna/Sol profiles migrate safely, including v0.8.0 Sol
+implementer/reviewer profiles (also used by the unreleased v0.8.1 candidate)
+and historical Windows CRLF variants. Exact Terra
 profiles are archived outside the agents directory. Customized
 Terra files are preserved with a warning; review and move them outside discovery manually.
 Modified or unsafe selected active profiles are never overwritten. No Codex configuration

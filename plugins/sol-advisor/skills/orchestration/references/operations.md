@@ -119,6 +119,8 @@ evidence. If both sources exist they must agree. The inspector is not a model fa
 
 ~~~sh
 python3 "$helper" inspect --expect-role luna <native-thread-uuid>
+# Primary verification permits absent agent_role; it never invents an auxiliary role:
+python3 "$helper" inspect --expect-primary <primary-thread-uuid>
 # Explicit hard-isolation check when required:
 python3 "$helper" inspect --expect-role sol --require-read-only <review-thread-uuid>
 ~~~
@@ -127,6 +129,13 @@ python3 "$helper" inspect --expect-role sol --require-read-only <review-thread-u
 filename suffixes, reads only the matched session, prints allowlisted routing fields,
 and rejects ambiguous/missing/conflicting evidence. It does not print messages, tokens,
 environment variables, full configuration, or arbitrary rollout text.
+
+`--expect-primary` verifies the registry's primary model/effort and rejects observed
+parent-thread or named auxiliary identity. An absent primary `agent_role` remains
+null in the output. Default inspection and `--expect-role` still require observed
+auxiliary role identity. Primary and auxiliary selectors cannot be combined, and
+`--require-read-only` remains an auxiliary assertion. Conflicting routing metadata
+still fails; use a fresh session after model/profile updates.
 
 The `sol` reviewer and `astra` advisor request read-only isolation. Record actual sandbox
 and permission profile types. Observed read-only permits an enforced-isolation claim.

@@ -63,6 +63,21 @@ try {
     Assert-True (-not $result.Contains('PRIVATE_SENTINEL')) 'Runtime output leaked private data.'
     Assert-True (($result | ConvertFrom-Json).effort -ceq 'max') 'Runtime wrapper lost metadata.'
 
+    $primaryRows = @(
+        '{"type":"session_meta","payload":{"id":"00000000-0000-0000-0000-000000000001","prompt":"PRIVATE_SENTINEL"}}',
+        '{"type":"turn_context","payload":{"model":"gpt-6.1-sol","effort":"xhigh","cwd":"C:/project"}}'
+    )
+    $rolloutPath = Join-Path $sessions ('rollout-test-' + $thread + '.jsonl')
+    [IO.File]::WriteAllText($rolloutPath, ($primaryRows -join "`n"), [Text.UTF8Encoding]::new($false))
+    $result = Run-Script (Join-Path $scripts 'inspect-agent-runtime.ps1') @('-SessionsDir', $sessions, '-ThreadId', $thread, '-ExpectPrimary') $true
+    $observed = $result | ConvertFrom-Json
+    Assert-True ($observed.model -ceq 'gpt-6.1-sol' -and $observed.effort -ceq 'xhigh') 'Primary wrapper lost the registry pins.'
+    Assert-True ($null -eq $observed.agent_role) 'Primary wrapper invented an auxiliary identity.'
+    Assert-True (-not $result.Contains('PRIVATE_SENTINEL')) 'Primary output leaked private data.'
+    $null = Run-Script (Join-Path $scripts 'inspect-agent-runtime.ps1') @('-SessionsDir', $sessions, '-ThreadId', $thread) $false
+    [IO.File]::WriteAllText($rolloutPath, (($primaryRows -join "`n").Replace('gpt-6.1-sol', 'gpt-6-sol')), [Text.UTF8Encoding]::new($false))
+    $null = Run-Script (Join-Path $scripts 'inspect-agent-runtime.ps1') @('-SessionsDir', $sessions, '-ThreadId', $thread, '-ExpectPrimary') $false
+
     # Mock the CLI only: no authentication, model calls, or real home writes.
     . (Join-Path $scripts 'python-common.ps1')
     $python = Get-SolAdvisorPython

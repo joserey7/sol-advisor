@@ -324,7 +324,7 @@ def policy_type(payload: dict, key: str):
     return string_or_null(value.get("type"))
 
 
-def inspect_runtime(sessions: Path, thread_id: str) -> dict:
+def inspect_runtime(sessions: Path, thread_id: str, *, require_agent_role=True) -> dict:
     if not UUID.fullmatch(thread_id):
         raise SupportError("THREAD_ID must be a lowercase UUID.")
     sessions = absolute_path(sessions)
@@ -366,6 +366,9 @@ def inspect_runtime(sessions: Path, thread_id: str) -> dict:
                 if kind == "session_meta":
                     if session is not None:
                         raise SupportError("Ambiguous session metadata.")
+                    for key in ("parent_thread_id", "agent_role"):
+                        if payload.get(key) is not None and not isinstance(payload[key], str):
+                            raise SupportError("Invalid session identity metadata.")
                     session = {key: string_or_null(payload.get(key)) for key in (
                         "id", "parent_thread_id", "agent_role", "agent_path", "model_provider"
                     )}
@@ -384,11 +387,21 @@ def inspect_runtime(sessions: Path, thread_id: str) -> dict:
                     routing = current
     except (OSError, ValueError, UnicodeError):
         raise SupportError("Rollout is unreadable or contains invalid JSON.") from None
-    if not session or session["id"] != thread_id or not session["agent_role"] or routing is None:
+    if not session or session["id"] != thread_id or routing is None:
+        raise SupportError("Missing or inconsistent required routing metadata.")
+    if require_agent_role and not session["agent_role"]:
         raise SupportError("Missing or inconsistent required routing metadata.")
     return {"thread_id": session["id"], "parent_thread_id": session["parent_thread_id"],
             "agent_role": session["agent_role"], "agent_path": session["agent_path"],
             "model_provider": session["model_provider"], **routing}
+
+
+def verify_primary_runtime(data: dict) -> None:
+    if data.get("parent_thread_id") is not None or data.get("agent_role") not in (None, "default"):
+        raise SupportError("Expected a primary session; auxiliary identity was observed.")
+    primary = REGISTRY["primary"]
+    if (data.get("model"), data.get("effort")) != (primary["model"], primary["effort"]):
+        raise SupportError("Primary model/effort differs from the registry pin.")
 
 
 def verify_runtime(data: dict, role: str, *, require_read_only=False) -> None:
@@ -411,7 +424,9 @@ def main(argv=None) -> int:
     setup.add_argument("--with-astra", action="store_true", help="Include the optional profile, not spending authorization")
     runtime = commands.add_parser("inspect", help="Print allowlisted routing metadata only")
     runtime.add_argument("--sessions-dir")
-    runtime.add_argument("--expect-role", choices=tuple(FILES))
+    selection = runtime.add_mutually_exclusive_group()
+    selection.add_argument("--expect-role", choices=tuple(FILES))
+    selection.add_argument("--expect-primary", action="store_true", help="Verify the primary model/effort without requiring an auxiliary role")
     runtime.add_argument("--require-read-only", action="store_true")
     runtime.add_argument("thread_id")
     commands.add_parser("check-plan", help="Validate a confirmed plan from stdin JSON; no models or mutations")
@@ -427,8 +442,10 @@ def main(argv=None) -> int:
             if args.require_read_only and not args.expect_role:
                 raise SupportError("--require-read-only requires --expect-role.")
             sessions = absolute_path(args.sessions_dir) if args.sessions_dir is not None else codex_home() / "sessions"
-            data = inspect_runtime(sessions, args.thread_id)
-            if args.expect_role:
+            data = inspect_runtime(sessions, args.thread_id, require_agent_role=not args.expect_primary)
+            if args.expect_primary:
+                verify_primary_runtime(data)
+            elif args.expect_role:
                 verify_runtime(data, args.expect_role, require_read_only=args.require_read_only)
             print(json.dumps(data, ensure_ascii=True, separators=(",", ":")))
         return 0
