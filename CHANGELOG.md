@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.1 - Unreleased
+
+- Fix the Windows `install-plugin.ps1 -Update` path for marketplaces registered
+  from a local clone. It refreshes the plugin from the registered local root;
+  Git-backed marketplaces still run `marketplace upgrade` first.
+
 ## 0.8.0 - 2026-09-22
 
 - Move primary, demanding implementation, and fresh review to GPT-6 Sol / xhigh;

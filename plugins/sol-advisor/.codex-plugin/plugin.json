@@ -1,6 +1,6 @@
 {
   "name": "sol-advisor",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Codex-native selective GPT-6 Sol/Luna delivery with optional explicitly authorized Astra decision advice.",
   "author": {"name": "Daniel McAteer", "url": "https://github.com/DannyMac180"},
   "homepage": "https://github.com/joserey7/sol-advisor#readme",

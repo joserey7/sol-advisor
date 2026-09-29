@@ -43,14 +43,31 @@ try {
     }
     if (-not $CodexCommand) { throw 'Codex CLI was not found. Install the native CLI or supply -CodexCommand with its executable path.' }
     if ($Update) {
-        & $CodexCommand plugin marketplace upgrade $marketplace
+        $marketplaceRaw = & $CodexCommand plugin marketplace list --json
+        if ($LASTEXITCODE -ne 0) { throw 'Could not query registered marketplaces. Companion agents were not changed.' }
+        $marketplaceListing = ($marketplaceRaw -join "`n") | ConvertFrom-Json
+        $registered = @($marketplaceListing.marketplaces | Where-Object { $_.name -ceq $marketplace })
+        if ($registered.Count -ne 1) { throw 'Expected exactly one registered marketplace for this fork.' }
+        $sourceProperty = $registered[0].PSObject.Properties['marketplaceSource']
+        if ($null -eq $sourceProperty -or $sourceProperty.Value.sourceType -ceq 'local') {
+            # Local marketplaces read directly from their registered root; plugin add refreshes the installed cache.
+            $marketplaceRoot = $registered[0].root
+            if ([string]::IsNullOrWhiteSpace($marketplaceRoot) -or -not (Test-Path -LiteralPath $marketplaceRoot -PathType Container)) {
+                throw 'Registered local marketplace root is missing or is not a directory.'
+            }
+        } elseif ($sourceProperty.Value.sourceType -ceq 'git') {
+            & $CodexCommand plugin marketplace upgrade $marketplace
+            if ($LASTEXITCODE -ne 0) { throw 'Marketplace upgrade failed. Companion agents were not changed.' }
+        } else {
+            throw 'Registered marketplace has an unsupported source type.'
+        }
     } else {
         if (-not $Source) { $Source = $repo }
         $registration = @('plugin', 'marketplace', 'add', $Source)
         if ($Ref) { $registration += @('--ref', $Ref) }
         & $CodexCommand @registration
+        if ($LASTEXITCODE -ne 0) { throw 'Marketplace registration failed. Companion agents were not changed.' }
     }
-    if ($LASTEXITCODE -ne 0) { throw 'Marketplace registration/update failed. Companion agents were not changed.' }
     & $CodexCommand plugin add $pluginId
     if ($LASTEXITCODE -ne 0) { throw 'Plugin installation failed. Companion agents were not changed.' }
     $raw = & $CodexCommand plugin list --json

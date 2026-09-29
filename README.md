@@ -83,6 +83,8 @@ plan validation, **not a hard token/credit limit**. See the
 ## Updating and migration
 
 Windows: rerun the bootstrap with `-Update`; add `-WithAstra` only for an opted-in profile.
+For a marketplace registered from a local clone, update that clone first: `-Update`
+refreshes from its registered path. Git-backed marketplaces are upgraded automatically.
 POSIX: upgrade the marketplace, add the plugin again, resolve its installed path, and
 rerun `install-agents.sh`. Start a fresh task after updating.
 
