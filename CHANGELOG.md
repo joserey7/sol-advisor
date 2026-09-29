@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.9.1 - 2026-09-29
+
+- Add `inspect --expect-primary` and PowerShell `-ExpectPrimary` to verify the
+  primary model/effort without requiring an auxiliary `agent_role`. Reject observed
+  auxiliary identities, conflicting metadata, and mismatched primary pins.
+- Keep default and selected auxiliary inspection strict, including observed role
+  identity and optional read-only checks. Model pins and routing policy are unchanged.
+- Clarify that updating the plugin skill alone does not migrate companion profiles;
+  rerun the bootstrap or companion installer and start a fresh Codex task.
+
 ## 0.9.0 - 2026-09-29
 
 - Move primary delivery, demanding implementation, and fresh review to GPT-6.1 Sol /

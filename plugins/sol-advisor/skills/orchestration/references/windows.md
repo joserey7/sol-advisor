@@ -20,6 +20,10 @@ marketplace, it upgrades the marketplace before refreshing the plugin. Run the
 bootstrap from a checkout containing this fix, even if the registered local path is
 another clone.
 
+Updating the plugin skill in Codex does not itself migrate `CODEX_HOME\agents`.
+Rerun this bootstrap (or the companion installer), then restart Codex and start a
+new task. `sol: legacy` means a recognized older reviewer profile is still installed.
+
 This process-only execution-policy option does not override managed organization policy.
 The bootstrap finds the exact installed plugin and installs its cached profiles, not
 potentially different templates from the working checkout. It never edits Codex model,
@@ -68,11 +72,14 @@ $helper = Join-Path $scripts 'native-support.py'
 '{"mode":"audit","difficulty":"judgment-heavy","risk":"material"}' |
     & $python.Executable @prefix $helper check-plan
 & $python.Executable @prefix $helper install --check-role sol
+& $python.Executable @prefix $helper inspect --expect-primary '<primary-thread-uuid>'
 & $python.Executable @prefix $helper inspect --expect-role sol --require-read-only '<native-thread-uuid>'
 ~~~
 
-The existing `inspect-agent-runtime.ps1 -ThreadId ... -SessionsDir ...` remains a
-metadata-only convenience wrapper. Use the Python invocation above for expected-role
+Use `inspect-agent-runtime.ps1 -ThreadId ... -SessionsDir ... -ExpectPrimary` to
+verify the primary model/effort without requiring an auxiliary role. The wrapper
+without `-ExpectPrimary` retains strict auxiliary metadata inspection.
+Use the Python invocation above for expected-role
 and hard-isolation assertions. Runtime checks must follow public metadata precedence
 and the actual-isolation rules in [operations.md](operations.md).
 

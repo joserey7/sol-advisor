@@ -37,6 +37,8 @@ Verify primary model and effort through available runtime metadata. The required
 is `gpt-6.1-sol` / `xhigh`. If unavailable, ask for user confirmation; if conflicting,
 request the correct session and stop before implementation or delegation. A skill
 cannot change the primary model. Never pretend metadata or access was observed.
+For a rollout fallback, use `inspect --expect-primary` (PowerShell `-ExpectPrimary`);
+the primary need not have an auxiliary `agent_role`. Keep `--expect-role` for auxiliaries.
 
 ## Separate capability, consequence risk, and delegation benefit
 

@@ -373,6 +373,67 @@ class NativeSupportTests(unittest.TestCase):
         with self.assertRaises(core.SupportError):
             core.inspect_runtime(self.sessions, THREAD)
 
+    def test_primary_without_agent_role_reports_verified_model_without_inventing_role(self):
+        rows = self.records()
+        rows[0]["payload"] = {"id": THREAD, "prompt": SECRET}
+        rows[-1]["payload"]["model"] = "gpt-6.1-sol"
+        rows[-1]["payload"]["effort"] = "xhigh"
+        self.rollout(rows)
+        result = self.cli("inspect", "--sessions-dir", str(self.sessions), "--expect-primary", THREAD)
+        self.assertEqual(0, result.returncode, result.stderr)
+        data = json.loads(result.stdout)
+        self.assertEqual(THREAD, data["thread_id"])
+        self.assertEqual("gpt-6.1-sol", data["model"])
+        self.assertEqual("xhigh", data["effort"])
+        self.assertIsNone(data["agent_role"])
+        self.assertNotIn(SECRET, result.stdout + result.stderr)
+        # Selecting an auxiliary still requires its observed role identity.
+        result = self.cli("inspect", "--sessions-dir", str(self.sessions), "--expect-role", "sol", THREAD)
+        self.assertNotEqual(0, result.returncode)
+        self.assertEqual("", result.stdout)
+
+    def test_primary_verification_rejects_auxiliary_identity_and_wrong_pins(self):
+        data = {"agent_role": None, "parent_thread_id": None, "model": "gpt-6.1-sol", "effort": "xhigh"}
+        core.verify_primary_runtime(data)
+        core.verify_primary_runtime(dict(data, agent_role="default"))
+        for field, value in [("agent_role", core.PINS["sol"][0]),
+                             ("agent_role", "unknown-role"), ("parent_thread_id", "parent"),
+                             ("model", "gpt-6-sol"), ("effort", "high"),
+                             ("model", None), ("effort", None)]:
+            with self.subTest(field=field, value=value), self.assertRaises(core.SupportError):
+                core.verify_primary_runtime(dict(data, **{field: value}))
+
+    def test_primary_cli_rejects_wrong_pins_and_missing_session_metadata(self):
+        for section, field, value in [(0, "id", "wrong"), (-1, "model", "gpt-6-sol"),
+                                      (-1, "effort", "high"), (-1, "model", None),
+                                      (-1, "effort", None)]:
+            rows = self.records()
+            rows[0]["payload"] = {"id": THREAD, "prompt": SECRET}
+            rows[-1]["payload"].update(model="gpt-6.1-sol", effort="xhigh")
+            rows[section]["payload"][field] = value
+            self.rollout(rows)
+            result = self.cli("inspect", "--sessions-dir", str(self.sessions), "--expect-primary", THREAD)
+            with self.subTest(field=field, value=value):
+                self.assertNotEqual(0, result.returncode)
+                self.assertEqual("", result.stdout)
+                self.assertNotIn(SECRET, result.stderr)
+
+    def test_primary_cli_does_not_accept_auxiliary_or_ambiguous_metadata(self):
+        rows = self.records()
+        rows[-1]["payload"].update(model="gpt-6.1-sol", effort="xhigh")
+        for records in (rows, rows + [rows[0]]):
+            self.rollout(records)
+            result = self.cli("inspect", "--sessions-dir", str(self.sessions), "--expect-primary", THREAD)
+            self.assertNotEqual(0, result.returncode)
+            self.assertEqual("", result.stdout)
+
+    def test_primary_cli_cannot_be_combined_with_auxiliary_or_isolation_checks(self):
+        for flags in [("--expect-role", "sol"), ("--require-read-only",)]:
+            result = self.cli("inspect", "--sessions-dir", str(self.sessions),
+                              "--expect-primary", *flags, THREAD)
+            self.assertNotEqual(0, result.returncode)
+            self.assertEqual("", result.stdout)
+
     def test_invalid_runtime_json_does_not_leak(self):
         path = self.rollout()
         path.write_text(SECRET + "{invalid", encoding="utf-8")
